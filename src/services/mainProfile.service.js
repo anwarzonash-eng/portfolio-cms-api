@@ -132,7 +132,8 @@ export class mainProfileService extends baseService {
         googleAnalyticsScript: req.body.googleAnalyticsScript,
         companytype: req.body.companytype,
       };
-      if (!req.body.profile_photo_1) {
+      
+      /*if (!req.body.profile_photo_1) {
         profile_photo_1 = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.profile_photo_1,
@@ -156,6 +157,8 @@ export class mainProfileService extends baseService {
         });
         bodyPayload.profile_photo_3 = profile_photo_3;
       }
+
+      */
 
       // if (!req.body.video) {
       //   video = await uploadPhoto.uploadRequest(req.files.video);

@@ -7,6 +7,10 @@ const CategoryModel = sequelize.define('Category', {
     defaultValue: Sequelize.UUIDV4,
     primaryKey: true,
   },
+
+  main_profile_id: {
+    type: DataTypes.UUID,
+  },
   label: {
     type: DataTypes.TEXT,
     allowNull: false,

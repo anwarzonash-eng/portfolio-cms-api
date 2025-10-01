@@ -17,4 +17,7 @@ export class AddDynamicGenerationDto {
   @IsString()
   @IsIn(['add', 'update', 'list', 'delete'])
   actionType;
+
+  @IsString()
+  main_profile_id;
 }

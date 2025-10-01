@@ -35,7 +35,8 @@ export class videoService extends baseService {
         private_title: req.body.private_title,
         main_profile_id: req.body.main_profile_id,
       };
-      if (!req.body.video) {
+      
+      /*if (!req.body.video) {
         video = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.video,
@@ -43,6 +44,7 @@ export class videoService extends baseService {
         });
         bodyPayload.video = video;
       }
+        */
 
       const [rowsUpdated, updatedUser] = await this._videoModel.update(
         bodyPayload,

@@ -229,7 +229,8 @@ export class portfolioService extends baseService {
         is_for_cypexsoft: req.body.is_for_cypexsoft,
         cypexsoft_category: req.body.cypexsoft_category,
       };
-      if (!req.body.thumbnail) {
+     
+     /* if (!req.body.thumbnail) {
         thumbnail = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.thumbnail,
@@ -253,6 +254,8 @@ export class portfolioService extends baseService {
         });
         bodyPayload.child_hero_banner = child_hero_banner;
       }
+
+      */
 
       if (req.files && req?.files?.pictures) {
         if (existingPortfolio.pictures) {
@@ -301,7 +304,7 @@ export class portfolioService extends baseService {
           returning: true,
         }
       );
-      console.log(rowsUpdated, updatedUser);
+      // console.log(rowsUpdated, updatedUser);
       response = updatedUser;
     } else if (req.body.actionType === 'delete') {
       let adsf = await this._portfolioModel.destroy({
@@ -322,7 +325,7 @@ export class portfolioService extends baseService {
     companytype,
     id // New parameter for id
   ) {
-    console.log('has_testimonial', has_testimonial);
+    // console.log('has_testimonial', has_testimonial);
     const categoryId =
       sharedcategorys === 'All'
         ? ''
@@ -340,16 +343,14 @@ export class portfolioService extends baseService {
           is_deleted = false
           AND content_nature = '${contentNature}'
           AND main_profile_id = '${mainProfileId}'
-          ${
-            sharedcategorys === 'All'
-              ? ''
-              : `AND '${categoryId}' IN (SELECT json_array_elements_text(categorys -> 'category_ids')::uuid)`
-          }
-          ${
-            has_testimonial === 'All'
-              ? ''
-              : `AND has_testimonial = '${has_testimonial}'`
-          }
+          ${sharedcategorys === 'All'
+          ? ''
+          : `AND '${categoryId}' IN (SELECT json_array_elements_text(categorys -> 'category_ids')::uuid)`
+        }
+          ${has_testimonial === 'All'
+          ? ''
+          : `AND has_testimonial = '${has_testimonial}'`
+        }
           AND companytype = '${companytype}'
       `;
     }
@@ -623,9 +624,9 @@ ORDER BY
     return results;
   }
 
-  async getPortfoliosByDetailProfileId(req, res){
-      try{
-        let query = `Select p."id", p.title, p.tagline_1, p.tagline_2,
+  async getPortfoliosByDetailProfileId(req, res) {
+    try {
+      let query = `Select p."id", p.title, p.tagline_1, p.tagline_2,
                       p.features_short, p.tech_short, p.features_long,
                       p.tech_long, p.link, p.thumbnail, p.child_hero_banner,
                       p.has_testimonial, p.company_icon, p."pictures",
@@ -652,14 +653,14 @@ ORDER BY
                   order by p."createdAt" DESC
                   limit 10 offset ${req.body.offSet}`;
 
-        const results = await sequelize.query(query, {
-          type: sequelize.QueryTypes.SELECT,
-        });
-    
-        return results;
-      }
-      catch(err){
-        throw new Error(err);
-     }
+      const results = await sequelize.query(query, {
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      return results;
+    }
+    catch (err) {
+      throw new Error(err);
+    }
   }
 }

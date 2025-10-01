@@ -54,7 +54,7 @@ class portfolioController extends baseController {
   sync = async (req, res, next) => {
     try {
       if (req.body.actionType == 'list') {
-        console.log('req.body', req.body);
+        // console.log('req.body', req.body);
         const skillsData = await this._portfolioService.list(
           req.body.contentNature,
           req.body.mainProfileId,
@@ -154,7 +154,7 @@ class portfolioController extends baseController {
     try {
       const data = await this._portfolioService.getPortfoliosByDetailProfileId(req);
       res.send(this._responseTemplate('Success', data, undefined));
-    } 
+    }
     catch (error) {
       next(error);
     }

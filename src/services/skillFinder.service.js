@@ -45,19 +45,60 @@ export class skillFinderService extends baseService {
       // .map(({ category }) => category);
 
       const mainProfiles = await this._mainProfileModel.findAll();
-      const skillsOptions = await this._categoryModel.findAll();
-      const selectedCategories = skillsOptions
-        .filter(skill => uniqueTitles.some(({ title }) => title.catagory === skill.label))
+      const allCategories = await this._categoryModel.findAll();
 
-      uniqueTitles = uniqueTitles.map(skill => ({ id: skill.title.id, title: skill.title.title, variation: skill.title.variation, catagory: skill.title.catagory }))
+      const uniqueSkillsIds = uniqueTitles.map(skill => skill.title.id);
+
+      const finalSelectedSkills = [];
+
+      for (const skill of uniqueTitles) {
+        for (const category of allCategories) {
+          if (category.skills_ids && category.skills_ids.skills_ids.includes(skill.title.id)) {
+            finalSelectedSkills.push({
+              id: skill.title.id,
+              title: skill.title.title,
+              variation: skill.title.variation,
+              catagory: category.label,
+            });
+          }
+
+        }
+      }
+      const finalSelectedSkillsOnlyIds = finalSelectedSkills.map(item => item.id);
+
+      uniqueTitles.forEach(item => {
+        if (!finalSelectedSkillsOnlyIds.includes(item.title.id)) {
+          finalSelectedSkills.push({
+            id: item.title.id,
+            title: item.title.title,
+            variation: item.title.variation,
+            catagory: 'fullstack',
+
+          });
+        }
+      });
+
+
+
+
+      // const selectedCategoriestmp = allCategories
+      //   .filter(category => category.skills_ids && category.skills_ids.skills_ids.some('1addd068-e6be-4ec0-9f98-eec51c283ad3'))
+
+
+
+      const selectedCategories = allCategories
+        .filter(category => category.skills_ids && category.skills_ids.skills_ids.some(id => uniqueSkillsIds.includes(id)))
+
+      // uniqueTitles = uniqueTitles.map(skill => ({ id: skill.title.id, title: skill.title.title, variation: skill.title.variation, catagory: skill.title.catagory }))
 
       // await this.findMatchedSkillsProfiles()
 
       return {
-        selectedSkills: uniqueTitles,
+
+        selectedSkills: finalSelectedSkills,
         selectedCategories: selectedCategories.map(obj => ({ id: obj.label, name: obj.title, tagline: obj.tagline, designation: obj.designation })),
         allSkills,
-        allCategories: skillsOptions.map(obj => ({ id: obj.label, name: obj.title, tagline: obj.tagline, designation: obj.designation })),
+        allCategories: allCategories.map(obj => ({ id: obj.label, name: obj.title, tagline: obj.tagline, designation: obj.designation })),
         mainProfiles: mainProfiles,
       };
     } catch (error) {

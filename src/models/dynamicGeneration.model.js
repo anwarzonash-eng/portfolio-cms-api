@@ -69,6 +69,10 @@ const DynamicGenerationModel = sequelize.define('Dynamic_Generation', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  main_profile_id: {
+    type: DataTypes.UUID,
+  },
+
 });
 DynamicGenerationModel.sync({ alter: true });
 export default DynamicGenerationModel;

@@ -46,7 +46,8 @@ export class educationService extends baseService {
         degree_end_date: req.body.degree_end_date,
         degree_description: req.body.degree_description,
       };
-      if (!req.body.thumbnail) {
+      
+      /*if (!req.body.thumbnail) {
         thumbnail = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.thumbnail,
@@ -54,6 +55,7 @@ export class educationService extends baseService {
         });
         bodyPayload.thumbnail = thumbnail;
       }
+        */
 
       const [rowsUpdated, updatedUser] = await this._educationModel.update(
         bodyPayload,

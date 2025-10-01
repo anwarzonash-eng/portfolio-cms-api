@@ -18,7 +18,7 @@ export class leadService extends baseService {
       contentObject.upload = upload;
     }
 
-    console.log({ body: req.body, files: req.files, upload });
+    // console.log({ body: req.body, files: req.files, upload });
 
     const newLead = await this._leadModel.create({
       name,
@@ -29,7 +29,7 @@ export class leadService extends baseService {
       content: contentObject,
     });
 
-    console.log('newLead', newLead);
+    // console.log('newLead', newLead);
 
     return newLead;
   }

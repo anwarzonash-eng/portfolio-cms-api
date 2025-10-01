@@ -23,6 +23,7 @@ export class dynamicGenerationService extends baseService {
         experience_variation10: req.body.experience_variation10,
         portfolio_variations: JSON.parse(req.body.portfolioVariations),
         companytype: req.body.companytype,
+        main_profile_id: req.body.main_profile_id
       });
       return await this.listdynamicGeneration();
     } else if (req.body.actionType === 'update') {
@@ -67,6 +68,7 @@ export class dynamicGenerationService extends baseService {
     const query = `select
     id,
     description,
+    main_profile_id,
     experience_variation1,
     experience_variation2,
     experience_variation3,

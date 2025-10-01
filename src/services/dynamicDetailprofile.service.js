@@ -65,32 +65,32 @@ export class dynamicdetailProfileService extends baseService {
       (category) => category.label === intro_category_id
     );
 
-    let mainIntro = mainCategory.mainIntro_heading.replace('${Skills}', allFormatedSkills)
+    // let mainIntro = mainCategory.mainIntro_heading.replace('${Skills}', allFormatedSkills)
     service.type = 'main'
-    service.intro_main = mainIntro
-    service.title = mainCategory.title
-    service.tagline = mainCategory.tagline
+    // service.intro_main = mainIntro
+    // service.title = mainCategory.title
+    // service.tagline = mainCategory.tagline
     service.category_id = mainCategory.id
-    service.picture = mainCategory.thumbnail
+    // service.picture = mainCategory.thumbnail
     service.skills = skills
 
 
-    let coverLetterContent = '';
-    coverLetterContent += `<h3>${tag_line}</h3></br>` + mainIntro;
+    // let coverLetterContent = '';
+    // coverLetterContent += `<h3>${tag_line}</h3></br>` + mainIntro;
 
 
     for (const element of inputCategoriesWithData) {
 
       let service_tmp = {}
 
-      let categoryTitle = `<h2>${element.title}</h2>`;
-      let categoryIntroHeading = element.intro_heading
-      let categoryIntroDetails = element.intro
+      // let categoryTitle = `<h2>${element.title}</h2>`;
+      // let categoryIntroHeading = element.intro_heading
+      // let categoryIntroDetails = element.intro
 
       let categorySKills = skills.filter((skill) => skill.category == element.label)
-      let categorySKillsNames = skills.filter((skill) => skill.category == element.label).map(skill => skill.title)
-      let formatCategorySkills = await this.getFormattedSkills(categorySKillsNames)
-      categoryIntroHeading = categoryIntroHeading.replace('${Skills}', formatCategorySkills)
+      // let categorySKillsNames = skills.filter((skill) => skill.category == element.label).map(skill => skill.title)
+      // let formatCategorySkills = await this.getFormattedSkills(categorySKillsNames)
+      // categoryIntroHeading = categoryIntroHeading.replace('${Skills}', formatCategorySkills)
       let uniqueGroupSet = new Set()
       let skillGroupDescription = ''
 
@@ -115,16 +115,16 @@ export class dynamicdetailProfileService extends baseService {
       });
 
       // const skillsGroups = skillsGroupsAll.filter(group => group.skils_ids.some(id => id == element.id))
-      categoryIntroDetails = categoryIntroDetails.replace('<ul>', `<ul>${skillGroupDescription}`)
+      // categoryIntroDetails = categoryIntroDetails.replace('<ul>', `<ul>${skillGroupDescription}`)
       // coverLetterContent += `<br/>` + categoryTitle + `<hr>` + categoryContent
 
       service_tmp.type = 'detail'
-      service_tmp.intro_main = categoryIntroHeading
-      service_tmp.title = element.title
-      service_tmp.tagline = element.tagline
-      service_tmp.intro_detail = categoryIntroDetails
+      // service_tmp.intro_main = categoryIntroHeading
+      // service_tmp.title = element.title
+      // service_tmp.tagline = element.tagline
+      // service_tmp.intro_detail = categoryIntroDetails
       service_tmp.category_id = element.id
-      service_tmp.picture = element.thumbnail
+      // service_tmp.picture = element.thumbnail
       service_tmp.skills = categorySKills
 
 
@@ -140,7 +140,7 @@ export class dynamicdetailProfileService extends baseService {
 
 
     skillsForCV = await this.getSkillGroupsInString(skillsGroups, 'cv', 0)
-    service.intro_detail = `<ul>${skillsForCV}</ul>`
+    // service.intro_detail = `<ul>${skillsForCV}</ul>`
     services.push(service)
     let response;
     const t = await sequelize.transaction()
@@ -154,8 +154,8 @@ export class dynamicdetailProfileService extends baseService {
       const uniqueid = await manageUniqeId.generateDynamicUniqueKey(
         mainProfileID
       );
-      const newExperiencesIDs = await this.insertExperiencesMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation)
-      const newPortfoliosIDs = await this.insertPortfoliosMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation, tinyURL)
+      const newExperiencesIDs = [] // await this.insertExperiencesMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation)
+      const newPortfoliosIDs = [] //  await this.insertPortfoliosMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation, tinyURL)
 
       const detailProfileValuess = {
         unique_id: uniqueid,
@@ -163,7 +163,7 @@ export class dynamicdetailProfileService extends baseService {
         main_profile_id: mainProfileID,
         designation: designation,
         tag_line: tag_line,
-        skills: `<ul>${skillsForCV}</ul>`,
+        skills: '', //`<ul>${skillsForCV}</ul>`,
         short_description: 'some short_description',
         experiences_ids: {
           experiences_ids: newExperiencesIDs
@@ -179,7 +179,7 @@ export class dynamicdetailProfileService extends baseService {
           ],
         },
         skills_ids: { skills_ids: inputUiqueSkillsIDs },
-        description: coverLetterContent || 'some description to work on',
+        description: 'some description to work on', // || coverLetterContent  
         category1_title: 'some category1_title',
         category1_description: '',
         category2_title: 'some category2_title',

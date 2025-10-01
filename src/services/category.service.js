@@ -32,6 +32,7 @@ export class categoryService extends baseService {
         companytype: req.body.companytype,
         short_description: req.body.short_description,
         thumbnail: thumbnail,
+        main_profile_id: req.body.main_profile_id
       });
 
       return await this.list();
@@ -59,7 +60,7 @@ export class categoryService extends baseService {
         companytype: req.body.companytype,
       };
 
-      if (!req.body.thumbnail) {
+      /*if (!req.body.thumbnail) {
         thumbnail = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.thumbnail,
@@ -67,6 +68,7 @@ export class categoryService extends baseService {
         });
         bodyPayload.thumbnail = thumbnail;
       }
+      */
 
       const [rowsUpdated, updatedUser] = await this._categoryModel.update(
         bodyPayload,

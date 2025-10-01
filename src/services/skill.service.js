@@ -47,7 +47,8 @@ export class skillService extends baseService {
         companytype: req.body.companytype,
         is_techstack: req.body.is_techstack,
       };
-      if (!req.body.icon) {
+      
+      /*if (!req.body.icon) {
         icon = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.icon,
@@ -55,6 +56,7 @@ export class skillService extends baseService {
         });
         bodyPayload.icon = icon;
       }
+      */
 
       const [rowsUpdated, updatedUser] = await this._skillModel.update(
         bodyPayload,

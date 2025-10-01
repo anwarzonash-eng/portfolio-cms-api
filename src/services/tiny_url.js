@@ -236,9 +236,10 @@ from tiny_urls left join "Portfolios" on "Portfolios".id = tiny_urls.portfolio_i
       }
       catch (error) {
         await transaction.rollback();
+        // console.log('error', error?[0]?.errors);
         response = {
           status: 'Error',
-          message: 'Something went wrong while generating tiny urls'
+          message: JSON.stringify(error).includes('unique violation') ? 'Tiny URL already exists. Try Again' : 'Something went wrong while generating tiny urls'
         }
       }
 

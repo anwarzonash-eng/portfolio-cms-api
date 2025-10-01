@@ -5,26 +5,95 @@ import { sequelize } from '../utils/database';
 const uploadPhoto = require('../utils/aws/s3');
 
 export class reportService extends baseService {
-  async list(req) {
-    let query = await this.getQuery(req);
-    // console.log(query);
-    const results = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT,
-    });
+    async list(req) {
+        let query = await this.getQuery(req);
+        // console.log(query);
+        const results = await sequelize.query(query, {
+            type: sequelize.QueryTypes.SELECT,
+        });
 
-    return results;
-  }
+        return results;
+    }
 
-  async getQuery(req) {
-    let type = req.body.actionType;
-    // console.log(type);
-    let domain = req.body.domain;
-    let unique_id = req.body.uniqueId;
-    let itemID = req.body.itemID;
+    async getQuery(req) {
+        let type = req.body.actionType;
+        // console.log(type);
+        let domain = req.body.domain;
+        let unique_id = req.body.uniqueId;
+        let itemID = req.body.itemID;
 
-    let query = '';
-    if (type == 'home')
-      query = `select 
+        let query = '';
+        if (type == 'home')
+            query = `select
+        (select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _categories.id,
+                    'label',
+                    _categories.label,
+                    'title',
+                    _categories.title,
+                    'designation',
+                    _categories.designation,
+					'tagline',
+                    _categories.tagline,
+					'intro',
+                    _categories.intro,
+					'"mainIntro"',
+                    _categories."mainIntro",
+					'experience_intro',
+                    _categories.experience_intro,
+					'short_description',
+                    _categories.short_description,
+					'thumbnail',
+                    _categories.thumbnail,
+					'intro_heading',
+                    _categories.intro_heading,
+					'"mainIntro_heading"',
+                    _categories."mainIntro_heading",
+					'skills_ids',
+                    _categories.skills_ids
+					
+                    )) 
+        from
+            "Categories" _categories) as Skills_Categories,
+            (select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _dynamicGeneration.id,
+                    'description',
+                    _dynamicGeneration.description,
+                    'skills_ids',
+                    _dynamicGeneration.skills_ids,
+                    'experience_variation1',
+                    _dynamicGeneration.experience_variation1,
+					'experience_variation2',
+                    _dynamicGeneration.experience_variation2,
+					'experience_variation3',
+                    _dynamicGeneration.experience_variation3,
+					'experience_variation4',
+                    _dynamicGeneration.experience_variation4,
+					'experience_variation5',
+                    _dynamicGeneration.experience_variation5,
+					'experience_variation9',
+                    _dynamicGeneration.experience_variation9,
+					'experience_variation10',
+                    _dynamicGeneration.experience_variation10,
+					'experience_variation6',
+                    _dynamicGeneration.experience_variation6,
+					'experience_variation7',
+                    _dynamicGeneration.experience_variation7,
+					'experience_variation8',
+                    _dynamicGeneration.experience_variation8,
+					'portfolio_variations',
+                    _dynamicGeneration.portfolio_variations
+					
+                    )) 
+        from
+            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+        
 
     _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
@@ -127,39 +196,18 @@ json_build_object(
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date",
-                    
-                    'skills',
-                    (
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'icon',
-                                    _skills.icon,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Portfolios" _portfolios_child,
-                            json_array_elements_text(skills_ids_shorts -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _portfolios.id = _portfolios_child.id
-                    )
-                )
-            ) as skills_ids
-        from
-            "Detail_Profiles" _detailProfile_child,
-            json_array_elements_text(portfolios_ids -> 'portfolio_ids') as fk
-            join "Portfolios" _portfolios on _portfolios.id = fk :: uuid
-        where
-            _detail_profile.id = _detailProfile_child.id
+                    _portfolios."ending_Date"))
+                    from
+            "Portfolios" _portfolios
+			JOIN "Detail_Profiles" AS dp ON true,
+  json_array_elements(dp.services) AS s_obj,
+  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
+WHERE
+  s_obj ->> 'type' = 'main'
+  AND s_obj ->> 'category_id' = p_cat_id
+  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND dp.unique_id =  '${unique_id}'
+
     ) AS portfolios_ids,
 
 (
@@ -187,7 +235,7 @@ json_build_object(
                 
              as skills_ids,
              
-                (
+(
         select
             json_agg(
                 json_build_object(
@@ -214,29 +262,14 @@ json_build_object(
                     'starting_date',
                     _experiences.starting_date,
                     'ending_Date',
-                    _experiences."ending_Date",
-                    'skills',
-                    (
-                        select
-                            json_agg(
-                                json_build_object('id', _skills.id, 'title', _skills.title,  'icon',
-                                    _skills.icon, 'url', _skills.url, 'order', _skills.order)
-                            ) as skills_ids
-                        from
-                            "Experiences" _experiences_child,
-                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _experiences.id = _experiences_child.id
-                    )
+                    _experiences."ending_Date"
+                    
                 )
-            ) as skills_ids
+            ) 
         from
-            "Detail_Profiles" _detailProfile_child,
-            json_array_elements_text(experiences_ids -> 'experiences_ids') as fk
-            join "Experiences" _experiences on _experiences.id = fk :: uuid
+           "Experiences" _experiences
         where
-            _detail_profile.id = _detailProfile_child.id
+            _experiences.main_profile_id = _main_profile.id and  content_nature ='prototype'
     ) AS experiences_ids,
 
 
@@ -251,8 +284,76 @@ _detail_profile.category3_status
     where unique_id = '${unique_id}' and "domain" = '${domain}'
     
     limit 1`;
-    else if (type == 'cv')
-      query = `select
+        else if (type == 'cv')
+            query = `select
+(select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _categories.id,
+                    'label',
+                    _categories.label,
+                    'title',
+                    _categories.title,
+                    'designation',
+                    _categories.designation,
+					'tagline',
+                    _categories.tagline,
+					'intro',
+                    _categories.intro,
+					'"mainIntro"',
+                    _categories."mainIntro",
+					'experience_intro',
+                    _categories.experience_intro,
+					'short_description',
+                    _categories.short_description,
+					'thumbnail',
+                    _categories.thumbnail,
+					'intro_heading',
+                    _categories.intro_heading,
+					'"mainIntro_heading"',
+                    _categories."mainIntro_heading",
+					'skills_ids',
+                    _categories.skills_ids
+					
+                    )) 
+        from
+            "Categories" _categories) as Skills_Categories,
+        (select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _dynamicGeneration.id,
+                    'description',
+                    _dynamicGeneration.description,
+                    'skills_ids',
+                    _dynamicGeneration.skills_ids,
+                    'experience_variation1',
+                    _dynamicGeneration.experience_variation1,
+					'experience_variation2',
+                    _dynamicGeneration.experience_variation2,
+					'experience_variation3',
+                    _dynamicGeneration.experience_variation3,
+					'experience_variation4',
+                    _dynamicGeneration.experience_variation4,
+					'experience_variation5',
+                    _dynamicGeneration.experience_variation5,
+					'experience_variation9',
+                    _dynamicGeneration.experience_variation9,
+					'experience_variation10',
+                    _dynamicGeneration.experience_variation10,
+					'experience_variation6',
+                    _dynamicGeneration.experience_variation6,
+					'experience_variation7',
+                    _dynamicGeneration.experience_variation7,
+					'experience_variation8',
+                    _dynamicGeneration.experience_variation8,
+					'portfolio_variations',
+                    _dynamicGeneration.portfolio_variations
+					
+                    )) 
+        from
+            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
      _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
        _main_profile.profile_photo_3,
@@ -355,28 +456,14 @@ _main_profile."calendly_link",
                     'starting_date',
                     _experiences.starting_date,
                     'ending_Date',
-                    _experiences."ending_Date",
-                    'skills',
-                    (
-                        select
-                            json_agg(
-                                json_build_object('id', _skills.id, 'title', _skills.title, 'url', _skills.url, 'order', _skills.order)
-                            ) as skills_ids
-                        from
-                            "Experiences" _experiences_child,
-                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _experiences.id = _experiences_child.id
-                    )
+                    _experiences."ending_Date"
+                    
                 )
-            ) as skills_ids
+            ) 
         from
-            "Detail_Profiles" _detailProfile_child,
-            json_array_elements_text(experiences_ids -> 'experiences_ids') as fk
-            join "Experiences" _experiences on _experiences.id = fk :: uuid
+           "Experiences" _experiences
         where
-            _detail_profile.id = _detailProfile_child.id
+            _experiences.main_profile_id = _main_profile.id and  content_nature ='prototype'
     ) AS experiences_ids,
     
 
@@ -415,38 +502,17 @@ _main_profile."calendly_link",
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date",
-                    'duplicate',
-                    _portfolios."duplicate",
-                    'skills',
-                    (
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Portfolios" _portfolios_child,
-                            json_array_elements_text(skills_ids_shorts -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _portfolios.id = _portfolios_child.id
-                    )
-                )
-            ) as skills_ids
+                    _portfolios."ending_Date"))
         from
-            "Detail_Profiles" _detailProfile_child,
-            json_array_elements_text(portfolios_ids -> 'portfolio_ids') as fk
-            join "Portfolios" _portfolios on _portfolios.id = fk :: uuid
-        where
-            _detail_profile.id = _detailProfile_child.id
+            "Portfolios" _portfolios
+			JOIN "Detail_Profiles" AS dp ON true,
+  json_array_elements(dp.services) AS s_obj,
+  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
+WHERE
+  s_obj ->> 'type' = 'main'
+  AND s_obj ->> 'category_id' = p_cat_id
+  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND dp.unique_id =  '${unique_id}'
     ) AS portfolios_ids,
 
 
@@ -490,8 +556,68 @@ where
     and "domain" = '${domain}'
 limit
     1`;
-    else if (type == 'portfolio')
-      query = `select
+        else if (type == 'portfolio')
+            query = `select
+
+        (select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _dynamicGeneration.id,
+                    'description',
+                    _dynamicGeneration.description,
+                    'skills_ids',
+                    _dynamicGeneration.skills_ids,
+                    'experience_variation1',
+                    _dynamicGeneration.experience_variation1,
+					'experience_variation2',
+                    _dynamicGeneration.experience_variation2,
+					'experience_variation3',
+                    _dynamicGeneration.experience_variation3,
+					'experience_variation4',
+                    _dynamicGeneration.experience_variation4,
+					'experience_variation5',
+                    _dynamicGeneration.experience_variation5,
+					'experience_variation9',
+                    _dynamicGeneration.experience_variation9,
+					'experience_variation10',
+                    _dynamicGeneration.experience_variation10,
+					'experience_variation6',
+                    _dynamicGeneration.experience_variation6,
+					'experience_variation7',
+                    _dynamicGeneration.experience_variation7,
+					'experience_variation8',
+                    _dynamicGeneration.experience_variation8,
+					'portfolio_variations',
+                    _dynamicGeneration.portfolio_variations
+					
+                    )) 
+        from
+            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            (
+                        select
+                            json_agg(
+                                json_build_object(
+                                    'id',
+                                    _skills.id,
+                                    'title',
+                                    _skills.title,
+                                    'icon',
+                                    _skills.icon,
+                                    'url',
+                                    _skills.url,
+                                    'order', _skills.order
+                                )
+                            ) as skills_ids
+                        from
+                            "Detail_Profiles" _detail_profile_child,
+                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
+                            join "Skills" _skills on _skills.id = fk :: uuid
+                        where
+                            _detail_profile.id = _detail_profile_child.id
+                    )
+                
+             as skills_ids,
     _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
        _main_profile.profile_photo_3,
@@ -574,38 +700,17 @@ _detail_profile.services,
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date",
-                    'duplicate',
-                    _portfolios."duplicate",
-                    'skills',
-                    (
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Portfolios" _portfolios_child,
-                            json_array_elements_text(skills_ids_shorts -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _portfolios.id = _portfolios_child.id
-                    )
-                )
-            ) as skills_ids
+                    _portfolios."ending_Date"))
         from
-            "Detail_Profiles" _detailProfile_child,
-            json_array_elements_text(portfolios_ids -> 'portfolio_ids') as fk
-            join "Portfolios" _portfolios on _portfolios.id = fk :: uuid
-        where
-            _detail_profile.id = _detailProfile_child.id
+            "Portfolios" _portfolios
+			JOIN "Detail_Profiles" AS dp ON true,
+  json_array_elements(dp.services) AS s_obj,
+  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
+WHERE
+  s_obj ->> 'type' = 'main'
+  AND s_obj ->> 'category_id' = p_cat_id
+  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND dp.unique_id =  '${unique_id}'
     ) AS portfolios_ids
 from
     "Detail_Profiles" _detail_profile
@@ -615,8 +720,67 @@ where
     and "domain" = '${domain}'
 limit
     1`;
-    else if (type == 'portfolioById')
-      query = `select
+        else if (type == 'portfolioById')
+            query = `select
+        (select
+            json_agg(
+                json_build_object(
+                    'id',
+                    _dynamicGeneration.id,
+                    'description',
+                    _dynamicGeneration.description,
+                    'skills_ids',
+                    _dynamicGeneration.skills_ids,
+                    'experience_variation1',
+                    _dynamicGeneration.experience_variation1,
+					'experience_variation2',
+                    _dynamicGeneration.experience_variation2,
+					'experience_variation3',
+                    _dynamicGeneration.experience_variation3,
+					'experience_variation4',
+                    _dynamicGeneration.experience_variation4,
+					'experience_variation5',
+                    _dynamicGeneration.experience_variation5,
+					'experience_variation9',
+                    _dynamicGeneration.experience_variation9,
+					'experience_variation10',
+                    _dynamicGeneration.experience_variation10,
+					'experience_variation6',
+                    _dynamicGeneration.experience_variation6,
+					'experience_variation7',
+                    _dynamicGeneration.experience_variation7,
+					'experience_variation8',
+                    _dynamicGeneration.experience_variation8,
+					'portfolio_variations',
+                    _dynamicGeneration.portfolio_variations
+					
+                    )) 
+        from
+            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            (
+                        select
+                            json_agg(
+                                json_build_object(
+                                    'id',
+                                    _skills.id,
+                                    'title',
+                                    _skills.title,
+                                    'icon',
+                                    _skills.icon,
+                                    'url',
+                                    _skills.url,
+                                    'order', _skills.order
+                                )
+                            ) as skills_ids
+                        from
+                            "Detail_Profiles" _detail_profile_child,
+                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
+                            join "Skills" _skills on _skills.id = fk :: uuid
+                        where
+                            _detail_profile.id = _detail_profile_child.id
+                    )
+                
+             as skills_ids,
             _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
     _main_profile.profile_photo_3,
@@ -711,40 +875,16 @@ _detail_profile.services,
                     'duplicate',
                     _portfolios."duplicate",
                     'ending_Date',
-                    _portfolios."ending_Date",
-                            'skills',
-                            (
-                                select
-                                    json_agg(
-                                        json_build_object(
-                                            'id',
-                                            _skills.id,
-                                            'title',
-                                            _skills.title,
-                                            'url',
-                                            _skills.url,
-                                             'icon',
-                                            _skills.icon,
-                                            'order', _skills.order
-                                        )
-                                    ) as skills_ids
-                                from
-                                    "Portfolios" _portfolios_child,
-                                    json_array_elements_text(skills_ids_shorts -> 'skills_ids') as fk
-                                    join "Skills" _skills on _skills.id = fk :: uuid
-                                where
-                                    _portfolios.id = _portfolios_child.id
-                            )
+                    _portfolios."ending_Date"
+                            
                         )
-                    ) as skills_ids
+                    ) 
                 from
-                    "Detail_Profiles" _detailProfile_child,
-                    json_array_elements_text(portfolios_ids -> 'portfolio_ids') as fk
-                    join "Portfolios" _portfolios on _portfolios.id = fk :: uuid
-                         and fk :: uuid = '${itemID}'
-                where
-                    _detail_profile.id = _detailProfile_child.id
-            ) AS portfolios_ids
+            "Portfolios" _portfolios
+        where
+            _portfolios.main_profile_id = _main_profile.id and  content_nature ='prototype'
+	and _portfolios.id = '${itemID}'
+    ) AS portfolios_ids
         from
             "Detail_Profiles" _detail_profile
             join "Main_Profiles" _main_profile on _main_profile.id = _detail_profile.main_profile_id
@@ -756,14 +896,14 @@ _detail_profile.services,
         limit
             1`;
 
-    return query;
-  }
+        return query;
+    }
 
 
-  
-  async listPortfolios(req) {
 
-    let  query = `Select p.id,
+    async listPortfolios(req) {
+
+        let query = `Select p.id,
                     p.title,
                     p.tagline_1,
                      p.tagline_2,
@@ -798,17 +938,17 @@ _detail_profile.services,
 					  inner join "Main_Profiles" m on m."id" = p."main_profile_id"
 		   where "is_for_cypexsoft"=true
 		   limit 10 offset ${req.body.offSet}`;
- 
-    const results = await sequelize.query(query, {
-        type: sequelize.QueryTypes.SELECT,
-      });
-  
-      return results;
-  }
 
-  async getPortfolioById(req){
-     try{
-        let query = `Select p.id,
+        const results = await sequelize.query(query, {
+            type: sequelize.QueryTypes.SELECT,
+        });
+
+        return results;
+    }
+
+    async getPortfolioById(req) {
+        try {
+            let query = `Select p.id,
                     p.title,
                     p.tagline_1,
                      p.tagline_2,
@@ -843,15 +983,15 @@ _detail_profile.services,
 					  inner join "Main_Profiles" m on m."id" = p."main_profile_id"
 		   where p."id"='${req.body.id}'`;
 
-        const results = await sequelize.query(query, {
-            type: sequelize.QueryTypes.SELECT,
-          });
-      
-          return results;
-     }
-     catch(err){
-        throw new Error(err);
-     }
-  }
+            const results = await sequelize.query(query, {
+                type: sequelize.QueryTypes.SELECT,
+            });
+
+            return results;
+        }
+        catch (err) {
+            throw new Error(err);
+        }
+    }
 
 }

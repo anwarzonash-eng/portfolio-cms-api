@@ -9,7 +9,7 @@ const uploadPhoto = require('../utils/aws/s3');
 export class testimonialsService extends baseService {
   async syncTestimonial(req) {
     let response;
-    console.log('reqqqqq', req.files);
+    // console.log('reqqqqq', req.files);
     let client_pic = '';
     let video = '';
 
@@ -61,7 +61,8 @@ export class testimonialsService extends baseService {
           req.body.portfolio_id !== 'null' ? req.body.portfolio_id : null,
         display_order: req.body.display_order,
       };
-      if (!req.body.client_pic) {
+      
+      /*if (!req.body.client_pic) {
         client_pic = await deletePhotoWhileUpdate({
           fileData: req.files,
           fileInFileData: req.files.client_pic,
@@ -78,6 +79,8 @@ export class testimonialsService extends baseService {
         bodyPayload.video = video;
       }
 
+      */
+
       const [rowsUpdated, updatedUser] = await this._testimonialsModel.update(
         bodyPayload,
 
@@ -86,7 +89,7 @@ export class testimonialsService extends baseService {
           returning: true,
         }
       );
-      console.log(rowsUpdated, updatedUser);
+      // console.log(rowsUpdated, updatedUser);
 
       response = updatedUser;
     } else if (req.body.actionType === 'delete') {
@@ -100,7 +103,7 @@ export class testimonialsService extends baseService {
         );
         return testimonialData;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
 

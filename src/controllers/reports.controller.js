@@ -69,7 +69,7 @@ class reportsController extends baseController {
             if (req.userData)
                 new userNotAuthorizaedException()
 
-            console.log(req.body)
+            // console.log(req.body)
 
 
 
@@ -85,7 +85,7 @@ class reportsController extends baseController {
         }
 
     }
-    
+
 
 }
 

@@ -46,6 +46,9 @@ export class CategoryDto {
   @IsIn(['add', 'delete', 'update', 'list'])
   actionType;
 
+  @IsString()
+  main_profile_id;
+
   // @IsString()
   // skillsIds;
 }
