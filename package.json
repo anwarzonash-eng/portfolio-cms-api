@@ -8,7 +8,11 @@
     "dev": " nodemon --exec babel-node ./src/server.js",
     "staging": " nodemon --exec babel-node ./src/server.js",
     "production": " nodemon --exec babel-node ./src/server.js",
-    "test": " nodemon --exec babel-node ./src/server.js"
+    "test": " nodemon --exec babel-node ./src/server.js",
+    "prestart": "npm run build",
+    "build": "babel src -d dist --extensions \".js\"",
+    "start": "node dist/server.js",
+    "vercel:local": "npx vercel dev"
   },
   "keywords": [],
   "author": "",
@@ -34,12 +38,17 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
     "nodemailer": "^6.9.13",
-    "nodemon": "^2.0.22",
-    "pg": "^8.10.0",
+    "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.1.13",
     "require": "^0.4.4",
     "sequelize": "^6.31.1",
+    "serverless-http": "^4.0.0",
     "util": "^0.12.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "babel-plugin-transform-typescript-metadata": "^0.3.2",
+    "nodemon": "^2.0.22"
   }
 }
