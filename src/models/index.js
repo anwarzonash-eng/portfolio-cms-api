@@ -1,0 +1,15 @@
+export { default as SkillModel } from './skills.model';
+export { default as PhotoModel } from './photo.model';
+export { default as UserModel } from './auth.model';
+export { default as experienceModel } from './experience.model';
+export { default as protfolioModel } from './portfolio.model';
+export { default as detailProfileModel } from './detailsProfile.model';
+export { default as EmailTemplateModel } from './emailTemplate.model';
+export { default as mainProfileModel } from './mainProfile.model';
+export { default as LeadsModel } from './leads.model';
+export { default as EducationModel } from './education.model';
+export { default as tiny_url } from './tiny_url';
+export { default as DynamicGenerationModel } from './dynamicGeneration.model';
+export { default as CategoryModel } from './category.model';
+export { default as TestimonialsModel } from './testimonials.model';
+export { default as VideoModel } from './video.model';

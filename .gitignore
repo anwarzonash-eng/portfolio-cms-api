@@ -1,0 +1,12 @@
+node_modules
+/node_modules
+build
+.idea
+
+
+
+# migration
+src/migrations/*.json
+
+#video convert
+temp
