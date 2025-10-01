@@ -9,6 +9,7 @@ import fileUpload from "express-fileupload";
 
 class App {
   app;
+
   constructor() {
     this.app = express();
 

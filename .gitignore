@@ -2,7 +2,7 @@ node_modules
 /node_modules
 build
 .idea
-dist
+/dist
 
 
 
@@ -11,4 +11,3 @@ src/migrations/*.json
 
 #video convert
 temp
-.vercel
