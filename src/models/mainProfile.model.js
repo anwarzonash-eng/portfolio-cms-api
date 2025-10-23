@@ -3,6 +3,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { getRandomColor } from '../utils/randomColor';
 
+
 const mainProfileModel = sequelize.define('Main_Profiles', {
   // Model attributes are defined here
   id: {

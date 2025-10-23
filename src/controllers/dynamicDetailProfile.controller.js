@@ -10,14 +10,13 @@ const uploadPhoto = require('../utils/aws/s3');
 
 class dynamicDetailProfileController extends baseController {
   constructor() {
-    super('/dynamic_detProfile');
+    super('/dynamic_Profile');
     this.initializeRouter();
   }
 
   initializeRouter() {
     this.router.post(
-      `${this.parentRouterPath}/add`,
-      validationMiddleware(dynamicDetailProfiledto),
+      `${this.parentRouterPath}/create`,
       this.dynamicGenertiondetailprofile
     );
     this.router.post(

@@ -92,9 +92,8 @@ export class reportService extends baseService {
 					
                     )) 
         from
-            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
         
-
     _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
        _main_profile.profile_photo_3,
@@ -275,7 +274,34 @@ WHERE
 
 
 _detail_profile.category3_description,
-_detail_profile.category3_status
+_detail_profile.category3_status,
+(
+      select
+          json_agg(
+              json_build_object(
+                  'id',
+                  _educations.id,
+                  'university_name',
+                  _educations.university_name,
+                  'university_website_link',
+                  _educations.university_website_link,
+                  'degree_description',
+                  _educations.degree_description,
+                  'degree_name',
+                  _educations.degree_name,
+                  'degree_start_date',
+                  _educations.degree_start_date,
+                  'degree_end_date',
+                  _educations.degree_end_date,
+                  'thumbnail',
+                  _educations.thumbnail
+              )
+          ) as education_details
+      from
+         
+           "Education" _educations where _educations.main_profile_id = _main_profile.id
+     
+  ) AS education_ids
     
     from "Detail_Profiles" _detail_profile join "Main_Profiles" _main_profile
     on _main_profile.id = _detail_profile.main_profile_id
@@ -353,7 +379,7 @@ _detail_profile.category3_status
 					
                     )) 
         from
-            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
      _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
        _main_profile.profile_photo_3,
@@ -541,11 +567,9 @@ WHERE
               )
           ) as education_details
       from
-          "Detail_Profiles" _detailProfile_child,
-          json_array_elements_text(education_ids -> 'education_ids') as fk
-          join "Education" _educations on _educations.id = fk :: uuid
-      where
-          _detail_profile.id = _detailProfile_child.id
+         
+           "Education" _educations where _educations.main_profile_id = _main_profile.id
+     
   ) AS education_ids
     
 from
@@ -593,7 +617,7 @@ limit
 					
                     )) 
         from
-            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
             (
                         select
                             json_agg(
@@ -711,7 +735,34 @@ WHERE
   AND s_obj ->> 'category_id' = p_cat_id
   AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
   AND dp.unique_id =  '${unique_id}'
-    ) AS portfolios_ids
+    ) AS portfolios_ids,
+     (
+      select
+          json_agg(
+              json_build_object(
+                  'id',
+                  _educations.id,
+                  'university_name',
+                  _educations.university_name,
+                  'university_website_link',
+                  _educations.university_website_link,
+                  'degree_description',
+                  _educations.degree_description,
+                  'degree_name',
+                  _educations.degree_name,
+                  'degree_start_date',
+                  _educations.degree_start_date,
+                  'degree_end_date',
+                  _educations.degree_end_date,
+                  'thumbnail',
+                  _educations.thumbnail
+              )
+          ) as education_details
+      from
+         
+           "Education" _educations where _educations.main_profile_id = _main_profile.id
+     
+  ) AS education_ids
 from
     "Detail_Profiles" _detail_profile
     join "Main_Profiles" _main_profile on _main_profile.id = _detail_profile.main_profile_id
@@ -756,7 +807,7 @@ limit
 					
                     )) 
         from
-            "Dynamic_Generations" _dynamicGeneration) as skills_groups,
+            "Dynamic_Generations" _dynamicGeneration where _dynamicGeneration.main_profile_id = _main_profile.id) as skills_groups,
             (
                         select
                             json_agg(
@@ -881,10 +932,39 @@ _detail_profile.services,
                     ) 
                 from
             "Portfolios" _portfolios
+            
         where
             _portfolios.main_profile_id = _main_profile.id and  content_nature ='prototype'
 	and _portfolios.id = '${itemID}'
-    ) AS portfolios_ids
+    ) AS portfolios_ids,
+     
+     (
+      select
+          json_agg(
+              json_build_object(
+                  'id',
+                  _educations.id,
+                  'university_name',
+                  _educations.university_name,
+                  'university_website_link',
+                  _educations.university_website_link,
+                  'degree_description',
+                  _educations.degree_description,
+                  'degree_name',
+                  _educations.degree_name,
+                  'degree_start_date',
+                  _educations.degree_start_date,
+                  'degree_end_date',
+                  _educations.degree_end_date,
+                  'thumbnail',
+                  _educations.thumbnail
+              )
+          ) as education_details
+      from
+         
+           "Education" _educations where _educations.main_profile_id = _main_profile.id
+     
+  ) AS education_ids
         from
             "Detail_Profiles" _detail_profile
             join "Main_Profiles" _main_profile on _main_profile.id = _detail_profile.main_profile_id

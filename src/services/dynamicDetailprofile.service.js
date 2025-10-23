@@ -18,144 +18,17 @@ export class dynamicdetailProfileService extends baseService {
 
   async dynamicGenertiondetailprofile(req) {
 
-    var tinyURL = []
-    var services = []
-    var service = {}
 
+    let { skills, services, tag_line, designation, main_id } = req.body;
+    const mainProfileID = main_id;
 
-    let skillsForCV = ''
-
-    let { skills, intro_category_id, tag_line, designation, domain } = req.body;
-    const mainProfileID = domain.main_id;
-    const targetDomain = domain.domain;
-
-    const skillsGroupsAll = await this._dynamicGenerationModel.findAll()
-    const skillsGroupsDedicatedAll = new Set()
-    // console.log(skillsGroupsAll);
-
-    let seenCategoriesSet = new Set();
-    let seenSkillsTitleSet = new Set();
-    let skillsIDSet = new Set()
-
-    skills.forEach(element => {
-      if (!seenCategoriesSet.has(element.category))
-        seenCategoriesSet.add(element.category)
-      if (!seenSkillsTitleSet.has(element.title))
-        seenSkillsTitleSet.add(element.title)
-      if (!skillsIDSet.has(element.id))
-        skillsIDSet.add(element.id)
-    });
-    let inputCategories = Array.from(seenCategoriesSet)
-    let inputUniqueSkillsAll = Array.from(seenSkillsTitleSet)
-    let inputUiqueSkillsIDs = Array.from(skillsIDSet)
-    let allFormatedSkills = await this.getFormattedSkills(inputUniqueSkillsAll)
-
-    let inputCategoriesWithData = await this._categoryModel.findAll({
-      where: {
-        label: {
-          [Op.in]: inputCategories,
-        },
-      },
-    })
-
-    let allcategories = await this._categoryModel.findAll()
-
-    // tag_line = `<h3>${tag_line}</h3></br>`
-    let mainCategory = allcategories.find(
-      (category) => category.label === intro_category_id
-    );
-
-    // let mainIntro = mainCategory.mainIntro_heading.replace('${Skills}', allFormatedSkills)
-    service.type = 'main'
-    // service.intro_main = mainIntro
-    // service.title = mainCategory.title
-    // service.tagline = mainCategory.tagline
-    service.category_id = mainCategory.id
-    // service.picture = mainCategory.thumbnail
-    service.skills = skills
-
-
-    // let coverLetterContent = '';
-    // coverLetterContent += `<h3>${tag_line}</h3></br>` + mainIntro;
-
-
-    for (const element of inputCategoriesWithData) {
-
-      let service_tmp = {}
-
-      // let categoryTitle = `<h2>${element.title}</h2>`;
-      // let categoryIntroHeading = element.intro_heading
-      // let categoryIntroDetails = element.intro
-
-      let categorySKills = skills.filter((skill) => skill.category == element.label)
-      // let categorySKillsNames = skills.filter((skill) => skill.category == element.label).map(skill => skill.title)
-      // let formatCategorySkills = await this.getFormattedSkills(categorySKillsNames)
-      // categoryIntroHeading = categoryIntroHeading.replace('${Skills}', formatCategorySkills)
-      let uniqueGroupSet = new Set()
-      let skillGroupDescription = ''
-
-      categorySKills.forEach(skill => {
-        // console.log();
-
-        const skillsGroups = skillsGroupsAll.find(group => group.skills_ids.skills_ids.some(id => id == skill.id))
-
-        if (skillsGroups) {
-          if (!uniqueGroupSet.has(skillsGroups.id)) {
-
-            skillGroupDescription += `<li>${skillsGroups.description?.trim()}</li>`
-            uniqueGroupSet.add(skillsGroups.id)
-
-          }
-          if (!skillsGroupsDedicatedAll.has(skillsGroups)) {
-
-            skillsGroupsDedicatedAll.add(skillsGroups)
-
-          }
-        }
-      });
-
-      // const skillsGroups = skillsGroupsAll.filter(group => group.skils_ids.some(id => id == element.id))
-      // categoryIntroDetails = categoryIntroDetails.replace('<ul>', `<ul>${skillGroupDescription}`)
-      // coverLetterContent += `<br/>` + categoryTitle + `<hr>` + categoryContent
-
-      service_tmp.type = 'detail'
-      // service_tmp.intro_main = categoryIntroHeading
-      // service_tmp.title = element.title
-      // service_tmp.tagline = element.tagline
-      // service_tmp.intro_detail = categoryIntroDetails
-      service_tmp.category_id = element.id
-      // service_tmp.picture = element.thumbnail
-      service_tmp.skills = categorySKills
-
-
-      services.push(service_tmp)
-
-
-      // console.log(skills.filter(skill => skill.category == element.label));
-
-
-    };
-
-    const skillsGroups = Array.from(skillsGroupsDedicatedAll)
-
-
-    skillsForCV = await this.getSkillGroupsInString(skillsGroups, 'cv', 0)
-    // service.intro_detail = `<ul>${skillsForCV}</ul>`
-    services.push(service)
     let response;
     const t = await sequelize.transaction()
     try {
 
-      // await sequelize.transaction(async (t) => {
-
-      req.body.actionType = 'add';
-
-      // const uniqueid = 1;
       const uniqueid = await manageUniqeId.generateDynamicUniqueKey(
         mainProfileID
       );
-      const newExperiencesIDs = [] // await this.insertExperiencesMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation)
-      const newPortfoliosIDs = [] //  await this.insertPortfoliosMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation, tinyURL)
 
       const detailProfileValuess = {
         unique_id: uniqueid,
@@ -163,23 +36,20 @@ export class dynamicdetailProfileService extends baseService {
         main_profile_id: mainProfileID,
         designation: designation,
         tag_line: tag_line,
-        skills: '', //`<ul>${skillsForCV}</ul>`,
+        skills: '',
         short_description: 'some short_description',
         experiences_ids: {
-          experiences_ids: newExperiencesIDs
-          // experiences_ids: ['ffcfbf06-f1b2-4fcf-a9ba-6edc104ea989'],
+          experiences_ids: []
+
         },
         portfolios_ids: {
-          portfolio_ids: newPortfoliosIDs,
+          portfolio_ids: [],
         },
         education_ids: {
-          education_ids: [
-            'f784f3e0-a339-486a-af39-dc09f6ab7913',
-            'deecc41d-a06f-461a-b3e0-a7e332c68c06',
-          ],
+          education_ids: [],
         },
-        skills_ids: { skills_ids: inputUiqueSkillsIDs },
-        description: 'some description to work on', // || coverLetterContent  
+        skills_ids: { skills_ids: skills },
+        description: 'some description to work on',
         category1_title: 'some category1_title',
         category1_description: '',
         category2_title: 'some category2_title',
@@ -193,35 +63,222 @@ export class dynamicdetailProfileService extends baseService {
         services: services
       }
       response = await this._detailProfileModel.create(detailProfileValuess, { transaction: t });
-      this.addTinyURL(
-        'profile',
-        targetDomain,
-        uniqueid,
-        mainProfileID,
-        response.id, tinyURL)
-
-      newPortfoliosIDs.forEach(portfolioID => {
-        this.addTinyURL(
-          'portfolio',
-          targetDomain,
-          uniqueid,
-          mainProfileID,
-          response.id, tinyURL, portfolioID)
-
-      });
-
-      const tinyResponse = await this._tiny_url.bulkCreate(tinyURL)
-
       await t.commit();
 
-      // await manageUniqeId.saveExistingIds('add', mainProfileID, uniqueid);
-      // })
+
     } catch (error) {
       await t.rollback();
       throw error;
     }
     return response;
   }
+
+  // async dynamicGenertiondetailprofile(req) {
+
+  //   var tinyURL = []
+  //   var services = []
+  //   var service = {}
+
+
+  //   let skillsForCV = ''
+
+  //   let { skills, intro_category_id, child_categories, tag_line, designation, domain } = req.body;
+  //   const mainProfileID = domain.main_id;
+  //   const targetDomain = domain.domain;
+
+  //   const skillsGroupsAll = await this._dynamicGenerationModel.findAll({ where: { main_profile_id: mainProfileID } })
+  //   const skillsGroupsDedicatedAll = new Set()
+  //   // console.log(skillsGroupsAll);
+
+  //   let seenCategoriesSet = new Set();
+  //   let seenSkillsTitleSet = new Set();
+  //   let skillsIDSet = new Set()
+
+  //   skills.forEach(element => {
+  //     if (!seenCategoriesSet.has(element.category))
+  //       seenCategoriesSet.add(element.category)
+  //     if (!seenSkillsTitleSet.has(element.title))
+  //       seenSkillsTitleSet.add(element.title)
+  //     if (!skillsIDSet.has(element.id))
+  //       skillsIDSet.add(element.id)
+  //   });
+  //   let inputCategories = Array.from(seenCategoriesSet)
+  //   let inputUniqueSkillsAll = Array.from(seenSkillsTitleSet)
+  //   let inputUiqueSkillsIDs = Array.from(skillsIDSet)
+  //   let allFormatedSkills = await this.getFormattedSkills(inputUniqueSkillsAll)
+
+  //   let inputCategoriesWithData = await this._categoryModel.findAll({
+  //     where: {
+  //       label: {
+  //         [Op.in]: inputCategories,
+  //       },
+  //     },
+  //   })
+
+  //   let allcategories = await this._categoryModel.findAll()
+
+  //   // tag_line = `<h3>${tag_line}</h3></br>`
+  //   let mainCategory = allcategories.find(
+  //     (category) => category.label === intro_category_id
+  //   );
+
+  //   // let mainIntro = mainCategory.mainIntro_heading.replace('${Skills}', allFormatedSkills)
+  //   service.type = 'main'
+  //   // service.intro_main = mainIntro
+  //   // service.title = mainCategory.title
+  //   // service.tagline = mainCategory.tagline
+  //   service.category_id = mainCategory.id
+  //   // service.picture = mainCategory.thumbnail
+  //   service.skills = skills
+
+
+  //   // let coverLetterContent = '';
+  //   // coverLetterContent += `<h3>${tag_line}</h3></br>` + mainIntro;
+
+
+  //   for (const element of inputCategoriesWithData) {
+
+  //     let service_tmp = {}
+
+  //     // let categoryTitle = `<h2>${element.title}</h2>`;
+  //     // let categoryIntroHeading = element.intro_heading
+  //     // let categoryIntroDetails = element.intro
+
+  //     let categorySKills = skills.filter((skill) => skill.category == element.label)
+  //     // let categorySKillsNames = skills.filter((skill) => skill.category == element.label).map(skill => skill.title)
+  //     // let formatCategorySkills = await this.getFormattedSkills(categorySKillsNames)
+  //     // categoryIntroHeading = categoryIntroHeading.replace('${Skills}', formatCategorySkills)
+  //     let uniqueGroupSet = new Set()
+  //     let skillGroupDescription = ''
+
+  //     categorySKills.forEach(skill => {
+  //       // console.log();
+
+  //       const skillsGroups = skillsGroupsAll.find(group => group.skills_ids.skills_ids.some(id => id == skill.id))
+
+  //       if (skillsGroups) {
+  //         if (!uniqueGroupSet.has(skillsGroups.id)) {
+
+  //           skillGroupDescription += `<li>${skillsGroups.description?.trim()}</li>`
+  //           uniqueGroupSet.add(skillsGroups.id)
+
+  //         }
+  //         if (!skillsGroupsDedicatedAll.has(skillsGroups)) {
+
+  //           skillsGroupsDedicatedAll.add(skillsGroups)
+
+  //         }
+  //       }
+  //     });
+
+  //     // const skillsGroups = skillsGroupsAll.filter(group => group.skils_ids.some(id => id == element.id))
+  //     // categoryIntroDetails = categoryIntroDetails.replace('<ul>', `<ul>${skillGroupDescription}`)
+  //     // coverLetterContent += `<br/>` + categoryTitle + `<hr>` + categoryContent
+
+  //     service_tmp.type = 'detail'
+  //     // service_tmp.intro_main = categoryIntroHeading
+  //     // service_tmp.title = element.title
+  //     // service_tmp.tagline = element.tagline
+  //     // service_tmp.intro_detail = categoryIntroDetails
+  //     service_tmp.category_id = element.id
+  //     // service_tmp.picture = element.thumbnail
+  //     service_tmp.skills = categorySKills
+
+
+  //     services.push(service_tmp)
+
+
+  //     // console.log(skills.filter(skill => skill.category == element.label));
+
+
+  //   };
+
+  //   const skillsGroups = Array.from(skillsGroupsDedicatedAll)
+
+
+  //   skillsForCV = await this.getSkillGroupsInString(skillsGroups, 'cv', 0)
+  //   // service.intro_detail = `<ul>${skillsForCV}</ul>`
+  //   services.push(service)
+  //   let response;
+  //   const t = await sequelize.transaction()
+  //   try {
+
+  //     // await sequelize.transaction(async (t) => {
+
+  //     req.body.actionType = 'add';
+
+  //     // const uniqueid = 1;
+  //     const uniqueid = await manageUniqeId.generateDynamicUniqueKey(
+  //       mainProfileID
+  //     );
+  //     const newExperiencesIDs = [] // await this.insertExperiencesMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation)
+  //     const newPortfoliosIDs = [] //  await this.insertPortfoliosMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation, tinyURL)
+
+  //     const detailProfileValuess = {
+  //       unique_id: uniqueid,
+  //       private_title: designation,
+  //       main_profile_id: mainProfileID,
+  //       designation: designation,
+  //       tag_line: tag_line,
+  //       skills: '', //`<ul>${skillsForCV}</ul>`,
+  //       short_description: 'some short_description',
+  //       experiences_ids: {
+  //         experiences_ids: newExperiencesIDs
+  //         // experiences_ids: ['ffcfbf06-f1b2-4fcf-a9ba-6edc104ea989'],
+  //       },
+  //       portfolios_ids: {
+  //         portfolio_ids: newPortfoliosIDs,
+  //       },
+  //       education_ids: {
+  //         education_ids: [
+  //           'f784f3e0-a339-486a-af39-dc09f6ab7913',
+  //           'deecc41d-a06f-461a-b3e0-a7e332c68c06',
+  //         ],
+  //       },
+  //       skills_ids: { skills_ids: inputUiqueSkillsIDs },
+  //       description: 'some description to work on', // || coverLetterContent  
+  //       category1_title: 'some category1_title',
+  //       category1_description: '',
+  //       category2_title: 'some category2_title',
+  //       category2_description: '',
+  //       category2_status: true,
+  //       category3_title: 'some category3_title',
+  //       category3_description: '',
+  //       category3_status: false,
+  //       content_nature: 'dynamic',
+  //       companytype: 'cypexsoft',
+  //       services: services
+  //     }
+  //     response = await this._detailProfileModel.create(detailProfileValuess, { transaction: t });
+  //     this.addTinyURL(
+  //       'profile',
+  //       targetDomain,
+  //       uniqueid,
+  //       mainProfileID,
+  //       response.id, tinyURL)
+
+  //     newPortfoliosIDs.forEach(portfolioID => {
+  //       this.addTinyURL(
+  //         'portfolio',
+  //         targetDomain,
+  //         uniqueid,
+  //         mainProfileID,
+  //         response.id, tinyURL, portfolioID)
+
+  //     });
+
+  //     const tinyResponse = await this._tiny_url.bulkCreate(tinyURL)
+
+  //     await t.commit();
+
+  //     // await manageUniqeId.saveExistingIds('add', mainProfileID, uniqueid);
+  //     // })
+  //   } catch (error) {
+  //     await t.rollback();
+  //     throw error;
+  //   }
+  //   return response;
+  // }
 
 
   async insertExperiencesMany(t, skills, mainProfileID, mainCategory, skillsGroups, designation) {

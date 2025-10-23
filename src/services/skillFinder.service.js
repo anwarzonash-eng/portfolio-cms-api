@@ -1,4 +1,5 @@
 import { SkillModel } from '../models';
+import { DynamicGenerationModel } from '../models'
 import baseService from './base.service';
 // import { skillsOptions } from './skillsOptions';
 
@@ -7,11 +8,15 @@ export class skillFinderService extends baseService {
 
   async skillFinder(req) {
     try {
-      const { description } = req.body;
+      const { description, main_profile_id } = req.body;
 
       const allSkills = await SkillModel.findAll({
-        attributes: ['id', 'title', 'variation', 'catagory'],
+        attributes: ['id', 'title', 'variation'],
         where: { is_deleted: false },
+      });
+      const allSkillGoups = await DynamicGenerationModel.findAll({
+        attributes: ['id', 'skills_ids'],
+        where: { main_profile_id: main_profile_id },
       });
 
       let matchedTitles = allSkills
@@ -19,87 +24,26 @@ export class skillFinderService extends baseService {
           [skill.title, ...(skill.variation || [])].filter(Boolean)
         )
         .filter((title) => new RegExp(`\\b${title}\\b`, 'i').test(description))
-        .map((title) => ({
-          title: allSkills.find((skill) =>
+        .map((title) => (
+          allSkills.find((skill) =>
             [skill.title, ...(skill.variation || [])].includes(title)
-          ),
-        }));
+          )
+        ));
 
-      let uniqueTitles = [...new Set(matchedTitles.map((item) => item.title))]
+      let finalSelectedSkills = [...new Set(matchedTitles.map((item) => item))]
         .filter(Boolean)
-        .map((title) => ({ title }));
-
-      const skillsWithIds = [
-        { name: { id: 1, name: "JavaScript" } },
-        { name: { id: 2, name: "JavaScript" } },
-        { name: { id: 3, name: "JavaScript" } },
-      ];
-
-      const skillsWithIdsAndCategories = [
-        { id: 1, category: "Web Development" },
-        { id: 2, category: "Data Science" },
-        { id: 4, category: "Databases" }
-      ];
-      //       const selectedCategories = skillsWithIdsAndCategories
-      // .filter(skill => skillsWithIds.some(({ name }) => name.id === skill.id))
-      // .map(({ category }) => category);
 
       const mainProfiles = await this._mainProfileModel.findAll();
-      const allCategories = await this._categoryModel.findAll();
+      const allCategories = await this._categoryModel.findAll({ where: { main_profile_id: main_profile_id } });
 
-      const uniqueSkillsIds = uniqueTitles.map(skill => skill.title.id);
-
-      const finalSelectedSkills = [];
-
-      for (const skill of uniqueTitles) {
-        for (const category of allCategories) {
-          if (category.skills_ids && category.skills_ids.skills_ids.includes(skill.title.id)) {
-            finalSelectedSkills.push({
-              id: skill.title.id,
-              title: skill.title.title,
-              variation: skill.title.variation,
-              catagory: category.label,
-            });
-          }
-
-        }
-      }
-      const finalSelectedSkillsOnlyIds = finalSelectedSkills.map(item => item.id);
-
-      uniqueTitles.forEach(item => {
-        if (!finalSelectedSkillsOnlyIds.includes(item.title.id)) {
-          finalSelectedSkills.push({
-            id: item.title.id,
-            title: item.title.title,
-            variation: item.title.variation,
-            catagory: 'fullstack',
-
-          });
-        }
-      });
-
-
-
-
-      // const selectedCategoriestmp = allCategories
-      //   .filter(category => category.skills_ids && category.skills_ids.skills_ids.some('1addd068-e6be-4ec0-9f98-eec51c283ad3'))
-
-
-
-      const selectedCategories = allCategories
-        .filter(category => category.skills_ids && category.skills_ids.skills_ids.some(id => uniqueSkillsIds.includes(id)))
-
-      // uniqueTitles = uniqueTitles.map(skill => ({ id: skill.title.id, title: skill.title.title, variation: skill.title.variation, catagory: skill.title.catagory }))
-
-      // await this.findMatchedSkillsProfiles()
 
       return {
 
         selectedSkills: finalSelectedSkills,
-        selectedCategories: selectedCategories.map(obj => ({ id: obj.label, name: obj.title, tagline: obj.tagline, designation: obj.designation })),
         allSkills,
-        allCategories: allCategories.map(obj => ({ id: obj.label, name: obj.title, tagline: obj.tagline, designation: obj.designation })),
+        allCategories: allCategories.map(obj => ({ id: obj.id, name: obj.title, tagline: obj.tagline, designation: obj.designation, skills_ids: obj.skills_ids })),
         mainProfiles: mainProfiles,
+        allSkillGoups
       };
     } catch (error) {
       console.error('Error in skillFinder:', error);
@@ -109,16 +53,18 @@ export class skillFinderService extends baseService {
 
   async findMatchedSkillsProfiles(req) {
 
-    const allDynamicProfiles = await this._detailProfileModel.findAll({ attributes: ['id', 'skills_ids', 'unique_id', 'designation', 'tag_line'], where: { content_nature: 'dynamic' } })
+    const main_profile_id = req.body.main_profile_id
+    const allDynamicProfiles = await this._detailProfileModel.findAll({ attributes: ['id', 'main_profile_id', 'skills_ids', 'unique_id', 'designation', 'tag_line'], where: { main_profile_id: main_profile_id } })
 
     var updateDynamicProfile = []
 
     allDynamicProfiles.forEach(dynamicProfile => {
       const profileSkills = dynamicProfile.skills_ids.skills_ids;
-      const new_skills = req.body.skill.filter((newSkills) => profileSkills.includes(newSkills));
+      const new_skills = req.body.skill.filter((newSkills) => profileSkills?.includes(newSkills));
 
       updateDynamicProfile.push({
         id: dynamicProfile.id,
+        main_profile_id: dynamicProfile.main_profile_id,
         unique_id: dynamicProfile.unique_id,
         designation: dynamicProfile.designation,
         tag_line: dynamicProfile.tag_line,
@@ -127,8 +73,8 @@ export class skillFinderService extends baseService {
       })
     });
 
-    updateDynamicProfile.sort((a, b) => a.matched_percentagecd - b.matched_percentage);
-
+    updateDynamicProfile.sort((a, b) => b.matched_percentage - a.matched_percentagecd);
+    updateDynamicProfile = updateDynamicProfile.filter((profile) => profile.matched_percentage > 0)
 
     // const filteredAllSkills = allDynamicProfiles.filter((allSkill) => {
     //   // Extract the skills_ids array from the nested object
