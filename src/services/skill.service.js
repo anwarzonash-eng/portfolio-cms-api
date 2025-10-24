@@ -11,7 +11,7 @@ export class skillService extends baseService {
     let response;
     let icon = '';
 
-    if (req.body.actionType === 'add') {
+    if (req.body.actionType === 'add' || req.body.is_file_changed == 'true') {
       icon = await uploadPhoto.uploadRequest(req.files.icon);
     }
 
@@ -42,12 +42,13 @@ export class skillService extends baseService {
         url: req.body.url,
         catagory: req.body.catagory,
         description: req.body.description,
-        variation: req.body.variation,
+        variation: JSON.parse(req.body.variation),
         order: req.body.order,
         companytype: req.body.companytype,
         is_techstack: req.body.is_techstack,
       };
-      
+      if (req.body.is_file_changed == 'true')
+        bodyPayload.icon = icon;
       /*if (!req.body.icon) {
         icon = await deletePhotoWhileUpdate({
           fileData: req.files,

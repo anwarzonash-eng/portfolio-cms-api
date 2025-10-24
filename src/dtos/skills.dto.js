@@ -44,6 +44,11 @@ export class SkillsDto {
   @IsString()
   is_techstack;
 
+  @IsOptional()
+  @IsString()
+  is_file_changed;
+
+
   // @IsString()
   // companytype;
 

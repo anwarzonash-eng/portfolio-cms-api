@@ -7,10 +7,16 @@ const DynamicGenerationModel = sequelize.define('Dynamic_Generation', {
     defaultValue: Sequelize.UUIDV4,
     primaryKey: true,
   },
+  label: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+
+
   experience_variation1: {
     type: DataTypes.TEXT,
     allowNull: true,

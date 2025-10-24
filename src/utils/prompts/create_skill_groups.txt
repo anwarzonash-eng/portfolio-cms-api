@@ -1,0 +1,91 @@
+I have following insert query.
+
+
+I need am writing my CV.. In my CV I have 10 portfolios and 10 experiences and main CV info. 
+
+I am writing description for each tech stack. I am a web developer.
+
+I want you to take following script and create minimum 100 characters and maximum 200 characters. make it random.
+
+create one description, 10 different version of experiences, 10 different versions of portfoliosn. you need to write I have done using that tech stack.
+
+tech stack is: Angular. 
+
+You don't need to give generic info about tech stack. You need to write what I have done using that tech stack. write 10 different use cases for experiences and 10 different use cases for portfolios. and in description, write generic info like what knowledge or related tech stack skills I have for example if it's css, you can talk about tailwindcss.. if it's react, you can talk about redux, SPA, etc... 
+
+also wrap important keywords and related tech stack with u html tag. keep everything same.
+
+one more important thing.. portfolio variation will be used for different projects.. so use generic use cases for experiences and portfolios
+
+here's my sql query. 
+
+In short: replace following
+
+id: A new unique UUID for id
+
+description: A generic description (100–200 chars) for Angular with related stack mentions
+
+10 experience variations (each distinct, focused on projects done with Angular)
+
+10 portfolio variations (each distinct, focused on projects done with Angular). one more important thing.. for portfolio variation will be used for different projects.. so use generic use cases and portfolios
+
+keep the projects for portfolio generic, you can talk about modules not overall projects because it would use for all projects for. if a project is eCommerce it would not justify hr... you can talk about payment methods, secutiries, etc these are generic and almost fit everywhere in all projects.
+
+don't start statements with I or we 
+ 
+
+All wrapped important keywords with <u> as requested.
+
+only replace description, all version of experience and portfolios. also add new unique UUID in id.. kep companytype and main_profile_id same
+
+
+INSERT INTO public."Dynamic_Generations"(
+	id,
+	description, 
+	skills_ids, 
+	experience_variation1, 
+	experience_variation2, 
+	experience_variation3, 
+	experience_variation4, 
+	experience_variation5, 
+	experience_variation6, 
+	experience_variation7,
+	experience_variation8,
+	experience_variation9,
+	experience_variation10,
+	portfolio_variations,
+	companytype, 
+	main_profile_id)
+	VALUES (
+		'4511d33c-04c9-467f-94d3-13824f15d787',		
+		'description', 
+			'{"skills_ids":[]}',
+			'experience_variation_1',
+			'experience_variation_2',
+			'experience_variation_3',
+			'experience_variation_4',
+			'experience_variation_5',
+			'experience_variation_6',
+			'experience_variation_7',
+			'experience_variation_8',
+			'experience_variation_9',
+			'experience_variation_10',
+			'{
+  "portfolio_variation1": "portfolio_variation1",
+  "portfolio_variation2":"portfolio_variation2",
+  "portfolio_variation3": "portfolio_variation3",
+  "portfolio_variation4": "portfolio_variation4",
+  "portfolio_variation5": "portfolio_variation5",
+  "portfolio_variation6": "portfolio_variation6",
+  "portfolio_variation7": "portfolio_variation7",
+  "portfolio_variation8": "portfolio_variation8",
+  "portfolio_variation9": "portfolio_variation9",
+  "portfolio_variation10": "portfolio_variation10"
+}',
+			'cypexsoft',
+			'8bc33b51-204f-4a85-9242-4a38c73e35aa'
+		   
+		   
+		   );
+
+

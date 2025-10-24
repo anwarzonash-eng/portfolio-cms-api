@@ -11,6 +11,7 @@ export class dynamicGenerationService extends baseService {
       response = await this._dynamicGenerationModel.create({
         skills_ids: JSON.parse(req.body.skillsIds),
         description: req.body.description,
+        label: req.body.label,
         experience_variation1: req.body.experience_variation1,
         experience_variation2: req.body.experience_variation2,
         experience_variation3: req.body.experience_variation3,
@@ -29,6 +30,7 @@ export class dynamicGenerationService extends baseService {
     } else if (req.body.actionType === 'update') {
       let bodyPayload = {
         skills_ids: JSON.parse(req.body.skillsIds),
+        label: req.body.label,
         description: req.body.description,
         experience_variation1: req.body.experience_variation1,
         experience_variation2: req.body.experience_variation2,
@@ -81,6 +83,7 @@ export class dynamicGenerationService extends baseService {
     experience_variation10,
     companytype,
     portfolio_variations,
+    label,
     
     (
         select
