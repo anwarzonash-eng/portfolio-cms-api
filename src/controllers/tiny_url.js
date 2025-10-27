@@ -94,6 +94,7 @@ class tiny_url extends baseController {
     catch (error) {
       next(error)
     }
+
   }
 }
 

@@ -1,6 +1,7 @@
 import baseService from './base.service';
 import * as manageUniqeId from '../utils/manageUniqeIds/manageUniqueId';
-import { DynamicGenerationModel, SkillModel, CategoryModel } from '../models';
+import { DynamicGenerationModel, SkillModel, CategoryModel, protfolioModel } from '../models';
+
 // import { skillsOptions } from './skillsOptions';
 import { Op } from 'sequelize';
 import { sequelize } from '../utils/database';
@@ -19,8 +20,9 @@ export class dynamicdetailProfileService extends baseService {
   async dynamicGenertiondetailprofile(req) {
 
 
-    let { skills, services, tag_line, designation, main_id } = req.body;
+    let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title } = req.body;
     const mainProfileID = main_id;
+    domain = 'https://' + domain;
 
     let response;
     const t = await sequelize.transaction()
@@ -32,7 +34,7 @@ export class dynamicdetailProfileService extends baseService {
 
       const detailProfileValuess = {
         unique_id: uniqueid,
-        private_title: designation,
+        private_title: private_title,
         main_profile_id: mainProfileID,
         designation: designation,
         tag_line: tag_line,
@@ -63,14 +65,115 @@ export class dynamicdetailProfileService extends baseService {
         services: services
       }
       response = await this._detailProfileModel.create(detailProfileValuess, { transaction: t });
-      await t.commit();
+      const mainCategoryID = services.find(service => service.type == 'main').category_id || null;
 
+      const allportfolios = await protfolioModel.findAll();
+      const selectedPortfolios = mainCategoryID ? allportfolios.filter(portfolio => {
+        if (portfolio.main_profile_id === mainProfileID && portfolio.categorys.category_ids.some(id => id == mainCategoryID)) {
+          return true;
+        } else { return false; }
+
+      }) : [];
+      let tinyResponse = null;
+      if (is_create_tiny_url) {
+
+        var tinyURL = []
+        this.addTinyURL(
+          'profile',
+          domain,
+          uniqueid,
+          mainProfileID,
+          response.id, tinyURL)
+
+        selectedPortfolios.forEach(portfolioID => {
+          this.addTinyURL(
+            'portfolio',
+            domain,
+            uniqueid,
+            mainProfileID,
+            response.id, tinyURL, portfolioID.id)
+
+        });
+
+        tinyResponse = await this._tiny_url.bulkCreate(tinyURL)
+
+        await t.commit();
+        return this.getFormattedResponse(response.unique_id, response.private_title, response.designation, tinyResponse, domain, selectedPortfolios);
+        // return { ...response.dataValues, portfolios_ids: selectedPortfolios?.map(portfolio => { return { portfolio_id: portfolio.id, portfolio_title: portfolio.title } }), tinyResponse };
+      }
+      return this.getFormattedResponse(
+        response.unique_id,
+        response.private_title,
+        response.designation,
+        tinyResponse, domain, selectedPortfolios);
+      // return { ...response.dataValues, portfolios_ids: selectedPortfolios?.map(portfolio => { return { portfolio_id: portfolio.id, portfolio_title: portfolio.title } }) };
 
     } catch (error) {
       await t.rollback();
       throw error;
     }
-    return response;
+
+  }
+
+  async getFormattedResponse(unique_id, private_title, designation, tinyUrlResponse, domain, portfolios = []) {
+
+    const uniqe_id = unique_id;
+    const urls = [];
+    urls.push({
+      is_portfolio_detail: false,
+      page: 'Home',
+      link_without_u: `${domain}/${uniqe_id}`,
+      link_with_u: `${domain}/${uniqe_id}?u=_`,
+      tiny_link_without_u: tinyUrlResponse ? this.gettinyURLUniqeID('profile', false, tinyUrlResponse) : null,
+      tiny_link_with_u: tinyUrlResponse ? this.gettinyURLUniqeID('profile', true, tinyUrlResponse) : null
+    })
+    urls.push({
+      is_portfolio_detail: false,
+      page: 'Cv',
+      link_without_u: `${domain}/${uniqe_id}/cv`,
+      link_with_u: `${domain}/${uniqe_id}/cv?u=_`,
+      tiny_link_without_u: tinyUrlResponse ? this.gettinyURLUniqeID('cv', false, tinyUrlResponse) : null,
+      tiny_link_with_u: tinyUrlResponse ? this.gettinyURLUniqeID('cv', true, tinyUrlResponse) : null
+    })
+    urls.push({
+      is_portfolio_detail: false,
+      page: 'Contact',
+      link_without_u: `${domain}/${uniqe_id}/contact`,
+      link_with_u: `${domain}/${uniqe_id}/contact?u=_`,
+      tiny_link_without_u: tinyUrlResponse ? this.gettinyURLUniqeID('contact', false, tinyUrlResponse) : null,
+      tiny_link_with_u: tinyUrlResponse ? this.gettinyURLUniqeID('contact', true, tinyUrlResponse) : null
+    })
+    urls.push({
+      is_portfolio_detail: false,
+      page: 'Portfolio Main',
+      link_without_u: `${domain}/${uniqe_id}/portfolio`,
+      link_with_u: `${domain}/${uniqe_id}/portfolio?u=_`,
+      tiny_link_without_u: tinyUrlResponse ? this.gettinyURLUniqeID('portfolio_main', false, tinyUrlResponse) : null,
+      tiny_link_with_u: tinyUrlResponse ? this.gettinyURLUniqeID('portfolio_main', true, tinyUrlResponse) : null
+    })
+    portfolios.length > 0 && portfolios.forEach(portfolio => {
+      urls.push({
+        is_portfolio_detail: true,
+        page: portfolio.title,
+        link_without_u: `${domain}/${uniqe_id}/portfolio/${portfolio.id}`,
+        link_with_u: `${domain}/${uniqe_id}/portfolio/${portfolio.id}?u=_`,
+        tiny_link_without_u: tinyUrlResponse ? this.gettinyURLUniqeID('portfolio_detail', false, tinyUrlResponse, portfolio.id) : null,
+        tiny_link_with_u: tinyUrlResponse ? this.gettinyURLUniqeID('portfolio_detail', true, tinyUrlResponse, portfolio.id) : null
+      })
+
+    })
+
+    return { uniqe_id, private_title, designation, urls }
+
+
+  }
+
+  gettinyURLUniqeID(key, is_u, tinyUrlResponse, portfolio_detail_id = null) {
+    const response = portfolio_detail_id ?
+      tinyUrlResponse.find(tinyURL => tinyURL.type === key && tinyURL.is_u == is_u && tinyURL.portfolio_id == portfolio_detail_id)?.uniqe_id || null
+      : tinyUrlResponse.find(tinyURL => tinyURL.type === key && tinyURL.is_u == is_u)?.uniqe_id || null;
+
+    return response ? 'https://gourls.link/' + response : null;
   }
 
   // async dynamicGenertiondetailprofile(req) {
@@ -501,6 +604,7 @@ export class dynamicdetailProfileService extends baseService {
 
 
   }
+
 
   async addTinyURL(type, target_link, unique_id, main_profile_id, detail_profile_id, tinyURL, portfolio_detail_id = '') {
 

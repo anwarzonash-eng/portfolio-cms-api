@@ -10,7 +10,7 @@ const tiny_url = sequelize.define('tiny_url', {
     defaultValue: function () {
       // Generate a random 4-character alphanumeric string with integers
       const alphabet =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~';
       let id = '';
       for (let i = 0; i < 4; i++) {
         id += alphabet[Math.floor(Math.random() * alphabet.length)];
