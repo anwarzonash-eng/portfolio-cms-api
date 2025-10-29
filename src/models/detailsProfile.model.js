@@ -18,7 +18,19 @@ const detailProfileModel = sequelize.define('Detail_Profiles', {
   },
 
   unique_id: {
-    type: DataTypes.TEXT,
+    type: Sequelize.STRING(6),
+
+    defaultValue:
+
+      function () {
+        const alphabet =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~';
+        let id = '';
+        for (let i = 0; i < 4; i++) {
+          id += alphabet[Math.floor(Math.random() * alphabet.length)];
+        }
+        return id;
+      },
   },
 
   skills_ids: {

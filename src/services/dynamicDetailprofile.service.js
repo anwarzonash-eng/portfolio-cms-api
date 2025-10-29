@@ -1,5 +1,4 @@
 import baseService from './base.service';
-import * as manageUniqeId from '../utils/manageUniqeIds/manageUniqueId';
 import { DynamicGenerationModel, SkillModel, CategoryModel, protfolioModel } from '../models';
 
 // import { skillsOptions } from './skillsOptions';
@@ -19,21 +18,24 @@ export class dynamicdetailProfileService extends baseService {
 
   async dynamicGenertiondetailprofile(req) {
 
-
-    let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title } = req.body;
-    const mainProfileID = main_id;
-    domain = 'https://' + domain;
-
-    let response;
-    const t = await sequelize.transaction()
     try {
 
-      const uniqueid = await manageUniqeId.generateDynamicUniqueKey(
-        mainProfileID
-      );
+
+      let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title } = req.body;
+      const mainProfileID = main_id;
+      domain = 'https://' + domain;
+
+
+      let response;
+      // const t = await sequelize.transaction()
+
+
+      // const uniqueid = await manageUniqeId.generateDynamicUniqueKey(
+      //   mainProfileID
+      // );
 
       const detailProfileValuess = {
-        unique_id: uniqueid,
+        // unique_id: uniqueid,
         private_title: private_title,
         main_profile_id: mainProfileID,
         designation: designation,
@@ -64,14 +66,16 @@ export class dynamicdetailProfileService extends baseService {
         companytype: 'cypexsoft',
         services: services
       }
-      response = await this._detailProfileModel.create(detailProfileValuess, { transaction: t });
+      response = await this._detailProfileModel.create(detailProfileValuess);
       const mainCategoryID = services.find(service => service.type == 'main').category_id || null;
+
 
       const allportfolios = await protfolioModel.findAll();
       const selectedPortfolios = mainCategoryID ? allportfolios.filter(portfolio => {
         if (portfolio.main_profile_id === mainProfileID && portfolio.categorys.category_ids.some(id => id == mainCategoryID)) {
           return true;
         } else { return false; }
+
 
       }) : [];
       let tinyResponse = null;
@@ -81,7 +85,7 @@ export class dynamicdetailProfileService extends baseService {
         this.addTinyURL(
           'profile',
           domain,
-          uniqueid,
+          response.unique_id,
           mainProfileID,
           response.id, tinyURL)
 
@@ -89,7 +93,7 @@ export class dynamicdetailProfileService extends baseService {
           this.addTinyURL(
             'portfolio',
             domain,
-            uniqueid,
+            response.unique_id,
             mainProfileID,
             response.id, tinyURL, portfolioID.id)
 
@@ -97,10 +101,11 @@ export class dynamicdetailProfileService extends baseService {
 
         tinyResponse = await this._tiny_url.bulkCreate(tinyURL)
 
-        await t.commit();
+        // await t.commit();
         return this.getFormattedResponse(response.unique_id, response.private_title, response.designation, tinyResponse, domain, selectedPortfolios);
         // return { ...response.dataValues, portfolios_ids: selectedPortfolios?.map(portfolio => { return { portfolio_id: portfolio.id, portfolio_title: portfolio.title } }), tinyResponse };
       }
+      // await t.commit();
       return this.getFormattedResponse(
         response.unique_id,
         response.private_title,
@@ -108,8 +113,9 @@ export class dynamicdetailProfileService extends baseService {
         tinyResponse, domain, selectedPortfolios);
       // return { ...response.dataValues, portfolios_ids: selectedPortfolios?.map(portfolio => { return { portfolio_id: portfolio.id, portfolio_title: portfolio.title } }) };
 
+
     } catch (error) {
-      await t.rollback();
+      // await t.rollback();
       throw error;
     }
 
