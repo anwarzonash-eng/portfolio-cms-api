@@ -15,6 +15,10 @@ class dynamicGenerationController extends baseController {
       validationMiddleware(AddDynamicGenerationDto),
       this.sync
     );
+    this.router.post(
+      `${this.parentRouterPath}/add`,
+      this.add
+    );
   }
 
   sync = async (req, res, next) => {
@@ -36,6 +40,19 @@ class dynamicGenerationController extends baseController {
       next(error);
     }
   };
+
+  add = async (req, res) => {
+    try {
+
+      const response = await this._dynamicGenerationService.add(req);
+      res.send(this._responseTemplate('Success', response, undefined))
+
+    } catch (error) {
+      res.send(this._responseTemplate('Error', undefined, error))
+    }
+  };
+
+
 }
 
 export default dynamicGenerationController;

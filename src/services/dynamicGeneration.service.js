@@ -66,6 +66,17 @@ export class dynamicGenerationService extends baseService {
     return response;
   }
 
+  async add(req) {
+
+    // const bodyPayload = {
+    //   ...req.body,
+    //   skills_ids: JSON.parse(req.body.skillsIds),
+    // };
+    const response = await this._dynamicGenerationModel.create(req.body);
+
+    return response;
+  }
+
   async listdynamicGeneration() {
     const query = `select
     id,

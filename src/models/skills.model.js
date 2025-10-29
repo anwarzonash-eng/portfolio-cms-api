@@ -21,10 +21,12 @@ const SkillModel = sequelize.define('Skill', {
   catagory: {
     type: DataTypes.TEXT,
     allowNull: true,
+    defaultValue: 'fullstack',
   },
   order: {
     type: DataTypes.TEXT,
     allowNull: true,
+    defaultValue: '3',
   },
   description: {
     type: DataTypes.TEXT,

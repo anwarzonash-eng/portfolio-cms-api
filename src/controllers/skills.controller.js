@@ -17,7 +17,13 @@ class skillController extends baseController {
       validationMiddleware(SkillsDto),
       this.syncSkill
     );
+    this.router.post(
+      `${this.parentRouterPath}/add`,
+      this.addSkill
+    );
   }
+
+
 
   syncSkill = async (req, res, next) => {
     try {
@@ -32,6 +38,18 @@ class skillController extends baseController {
     } catch (error) {
       // console.log('error', error);
       next(error);
+    }
+  };
+
+  addSkill = async (req, res) => {
+    try {
+
+      let skillsData = await this._skillService.add(req);
+      res.send(this._responseTemplate('Success', skillsData, undefined));
+    } catch (error) {
+      res.send(this._responseTemplate('Error', undefined, error));
+      // console.log('error', error);
+      // next(error);
     }
   };
 }

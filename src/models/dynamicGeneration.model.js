@@ -61,6 +61,7 @@ const DynamicGenerationModel = sequelize.define('Dynamic_Generation', {
   skills_ids: {
     type: DataTypes.JSON,
     allowNull: true,
+
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,
@@ -74,6 +75,7 @@ const DynamicGenerationModel = sequelize.define('Dynamic_Generation', {
   companytype: {
     type: DataTypes.TEXT,
     allowNull: true,
+    defaultValue: 'cypexsoft',
   },
   main_profile_id: {
     type: DataTypes.UUID,

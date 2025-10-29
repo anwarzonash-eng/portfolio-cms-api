@@ -102,6 +102,15 @@ export class skillService extends baseService {
     return response;
   }
 
+  async add(req) {
+
+
+    const response = await this._skillModel.create(req.body);
+
+    return response;
+  }
+
+
   // async list() {
   //   const results = await this._skillModel.findAll({
   //     where: { is_deleted: false },
