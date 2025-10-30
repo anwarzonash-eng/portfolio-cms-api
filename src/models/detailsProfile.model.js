@@ -143,6 +143,42 @@ const detailProfileModel = sequelize.define('Detail_Profiles', {
     type: DataTypes.JSON,
     allowNull: true,
   },
+  pdf_urls: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {
+      status: 'pending',
+      error_message: '',
+      urls:
+        [{
+          type: 'home',
+          url: null
+        },
+
+        {
+          type: 'home_with_u',
+          url: null
+        }, {
+          type: 'cv',
+          url: null
+        },
+
+        {
+          type: 'cv_with_u',
+          url: null
+        }, {
+          type: 'portfolio_main',
+          url: null
+        },
+
+        {
+          type: 'portfolio_main_with_u',
+          url: null
+        }
+        ],
+
+    }
+  },
 });
 detailProfileModel.sync({ alter: true });
 export default detailProfileModel;
