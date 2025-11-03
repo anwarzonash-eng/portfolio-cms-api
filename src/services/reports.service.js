@@ -129,7 +129,6 @@ _main_profile."calendly_link",
             
  
       
-     _main_profile.hourly_rate,
      _main_profile.no_of_experiences,
      _main_profile.projects_completed,
   
@@ -272,7 +271,7 @@ WHERE
     ) AS experiences_ids,
 
 
-
+_detail_profile.hourly_rate,
 _detail_profile.category3_description,
 _detail_profile.category3_status,
 (
@@ -414,12 +413,13 @@ _main_profile."calendly_link",
             
  
       
-     _main_profile.hourly_rate,
+     
      _main_profile.no_of_experiences,
      _main_profile.projects_completed,
       _detail_profile.services,
     _main_profile."googleAnalyticsScript",
 
+    _detail_profile.hourly_rate,
     _detail_profile.designation,
 
     
@@ -676,12 +676,12 @@ _main_profile."calendly_link",
             
  
       
-     _main_profile.hourly_rate,
+     
      _main_profile.no_of_experiences,
      _main_profile.projects_completed,
       
     _main_profile."googleAnalyticsScript",
-
+_detail_profile.hourly_rate,
     _detail_profile.designation,
 _detail_profile.services,
     _detail_profile.tag_line,
@@ -868,7 +868,7 @@ _main_profile."calendly_link",
             
  
       
-     _main_profile.hourly_rate,
+     _detail_profile.hourly_rate,
      _main_profile.no_of_experiences,
      _main_profile.projects_completed,
       

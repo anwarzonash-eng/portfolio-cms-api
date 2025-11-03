@@ -21,7 +21,7 @@ export class dynamicdetailProfileService extends baseService {
     try {
 
 
-      let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title } = req.body;
+      let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title, hourly_rate } = req.body;
       const mainProfileID = main_id;
       domain = 'https://' + domain;
 
@@ -36,6 +36,7 @@ export class dynamicdetailProfileService extends baseService {
 
       const detailProfileValuess = {
         // unique_id: uniqueid,
+        hourly_rate: hourly_rate,
         private_title: private_title,
         main_profile_id: mainProfileID,
         designation: designation,
@@ -102,12 +103,14 @@ export class dynamicdetailProfileService extends baseService {
         tinyResponse = await this._tiny_url.bulkCreate(tinyURL)
 
         // await t.commit();
-        return this.getFormattedResponse(response.unique_id, response.private_title, response.designation, tinyResponse, domain, selectedPortfolios);
+        return this.getFormattedResponse(response.unique_id, response.pdf_urls, response.private_title, response.designation, tinyResponse, domain, selectedPortfolios);
         // return { ...response.dataValues, portfolios_ids: selectedPortfolios?.map(portfolio => { return { portfolio_id: portfolio.id, portfolio_title: portfolio.title } }), tinyResponse };
       }
       // await t.commit();
       return this.getFormattedResponse(
         response.unique_id,
+        response.pdf_urls,
+
         response.private_title,
         response.designation,
         tinyResponse, domain, selectedPortfolios);
@@ -121,7 +124,7 @@ export class dynamicdetailProfileService extends baseService {
 
   }
 
-  async getFormattedResponse(unique_id, private_title, designation, tinyUrlResponse, domain, portfolios = []) {
+  async getFormattedResponse(unique_id, pdf_urls, private_title, designation, tinyUrlResponse, domain, portfolios = []) {
 
     const uniqe_id = unique_id;
     const urls = [];
@@ -169,7 +172,7 @@ export class dynamicdetailProfileService extends baseService {
 
     })
 
-    return { uniqe_id, private_title, designation, urls }
+    return { uniqe_id, private_title, designation, urls, pdf_urls, domain: domain.replace('https://', '').trim() }
 
 
   }

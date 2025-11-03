@@ -57,10 +57,17 @@ export class skillFinderService extends baseService {
   async findMatchedSkillsProfiles(req) {
 
     const main_profile_id = req.body.main_profile_id
+    const mainProfile = await this._mainProfileModel.findOne(
+      {
+        attributes:
+          ['id', 'domain'],
+        where: { id: main_profile_id }
+      })
+
     const allDynamicProfiles = await this._detailProfileModel.findAll(
       {
         attributes:
-          ['id', 'services', 'skills_ids', 'main_profile_id', 'unique_id', 'designation', 'private_title', 'tag_line'],
+          ['id', 'services', 'skills_ids', 'main_profile_id', 'unique_id', 'designation', 'private_title', 'tag_line', 'pdf_urls'],
         where: { main_profile_id: main_profile_id }
       })
 
@@ -84,6 +91,7 @@ export class skillFinderService extends baseService {
         services: dynamicProfile.services,
         private_title: dynamicProfile.private_title,
         skills_ids: dynamicProfile.skills_ids,
+        pdf_urls: dynamicProfile.pdf_urls,
         matched_percentage: matched_percentage ? Math.round(matched_percentage) : 0,
         isOpen: false
       })
@@ -108,14 +116,16 @@ export class skillFinderService extends baseService {
 
         }) : [];
         const tinyUrlsResponse = await this._tiny_url.findAll({ where: { detail_profile_id: profile.id } });
-        const getFormatedResponse = await this.getFormattedResponse(profile.unique_id, tinyUrlsResponse, profile.domain, selectedPortfolios);
+        const getFormatedResponse = await this.getFormattedResponse(profile.unique_id, tinyUrlsResponse, mainProfile.domain, selectedPortfolios);
         return {
           ...getFormatedResponse,
           skills_ids: profile.skills_ids?.skills_ids || [],
           designation: profile.designation,
           tag_line: profile.tag_line,
           matched_percentage: profile.matched_percentage,
-          private_title: profile.private_title
+          private_title: profile.private_title,
+          pdf_urls: profile.pdf_urls,
+          domain: mainProfile.domain
         };
       });
 
