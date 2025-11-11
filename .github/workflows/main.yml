@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, personal_backend_vm]
-runs-on: [self-hosted, personal_backend_vm]
 
     strategy:
       matrix:
