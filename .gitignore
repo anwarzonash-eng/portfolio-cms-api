@@ -3,7 +3,7 @@ node_modules
 build
 .idea
 ./dist
-
+dist
 
 ./.env
 
