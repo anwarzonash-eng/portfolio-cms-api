@@ -30,8 +30,8 @@ jobs:
       - name: Build Project
         run: npm run build
 
-      - name: Start Application with PM2
-        run: pm2 start personal_backend
+      # - name: Start Application with PM2
+      #   run: pm2 start personal_backend
 
 
 
