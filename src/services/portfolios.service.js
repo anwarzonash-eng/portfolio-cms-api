@@ -229,33 +229,33 @@ export class portfolioService extends baseService {
         is_for_cypexsoft: req.body.is_for_cypexsoft,
         cypexsoft_category: req.body.cypexsoft_category,
       };
-     
-     /* if (!req.body.thumbnail) {
-        thumbnail = await deletePhotoWhileUpdate({
-          fileData: req.files,
-          fileInFileData: req.files.thumbnail,
-          existingFile: existingPortfolio.thumbnail,
-        });
-        bodyPayload.thumbnail = thumbnail;
-      }
-      if (!req.body.company_icon) {
-        company_icon = await deletePhotoWhileUpdate({
-          fileData: req.files,
-          fileInFileData: req.files.company_icon,
-          existingFile: existingPortfolio.company_icon,
-        });
-        bodyPayload.company_icon = company_icon;
-      }
-      if (!req.body.child_hero_banner) {
-        child_hero_banner = await deletePhotoWhileUpdate({
-          fileData: req.files,
-          fileInFileData: req.files.child_hero_banner,
-          existingFile: existingPortfolio.child_hero_banner,
-        });
-        bodyPayload.child_hero_banner = child_hero_banner;
-      }
 
-      */
+      /* if (!req.body.thumbnail) {
+         thumbnail = await deletePhotoWhileUpdate({
+           fileData: req.files,
+           fileInFileData: req.files.thumbnail,
+           existingFile: existingPortfolio.thumbnail,
+         });
+         bodyPayload.thumbnail = thumbnail;
+       }
+       if (!req.body.company_icon) {
+         company_icon = await deletePhotoWhileUpdate({
+           fileData: req.files,
+           fileInFileData: req.files.company_icon,
+           existingFile: existingPortfolio.company_icon,
+         });
+         bodyPayload.company_icon = company_icon;
+       }
+       if (!req.body.child_hero_banner) {
+         child_hero_banner = await deletePhotoWhileUpdate({
+           fileData: req.files,
+           fileInFileData: req.files.child_hero_banner,
+           existingFile: existingPortfolio.child_hero_banner,
+         });
+         bodyPayload.child_hero_banner = child_hero_banner;
+       }
+ 
+       */
 
       if (req.files && req?.files?.pictures) {
         if (existingPortfolio.pictures) {
@@ -351,7 +351,7 @@ export class portfolioService extends baseService {
           ? ''
           : `AND has_testimonial = '${has_testimonial}'`
         }
-          AND companytype = '${companytype}'
+          
       `;
     }
 

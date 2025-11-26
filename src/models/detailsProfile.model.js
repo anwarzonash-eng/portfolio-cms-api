@@ -24,7 +24,7 @@ const detailProfileModel = sequelize.define('Detail_Profiles', {
 
       function () {
         const alphabet =
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~';
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let id = '';
         for (let i = 0; i < 4; i++) {
           id += alphabet[Math.floor(Math.random() * alphabet.length)];
