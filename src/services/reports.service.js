@@ -137,8 +137,12 @@ _main_profile."calendly_link",
 
 
     _detail_profile.designation,
+    _detail_profile.website_purpose,
+    _detail_profile.website_created_for,
+
 
     _detail_profile.tag_line,
+    _detail_profile.pdf_urls,
     _detail_profile.short_description,
 	_detail_profile.description,
 _detail_profile.category1_title,
@@ -194,7 +198,10 @@ json_build_object(
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date"))
+                    _portfolios."ending_Date",
+                    'display_order',
+                    _portfolios.display_order
+                    ))
                     from
             "Portfolios" _portfolios
 			JOIN "Detail_Profiles" AS dp ON true,
@@ -203,7 +210,7 @@ json_build_object(
 WHERE
   s_obj ->> 'type' = 'main'
   AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
   AND dp.unique_id =  '${unique_id}'
 
     ) AS portfolios_ids,
@@ -421,8 +428,10 @@ _main_profile."calendly_link",
 
     _detail_profile.hourly_rate,
     _detail_profile.designation,
+    _detail_profile.pdf_urls,
 
-    
+    _detail_profile.website_purpose,
+    _detail_profile.website_created_for,
     _detail_profile.tag_line,
   
     _detail_profile.skills,
@@ -528,7 +537,9 @@ _main_profile."calendly_link",
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date"))
+                    _portfolios."ending_Date",
+                    'display_order',
+                    _portfolios.display_order))
         from
             "Portfolios" _portfolios
 			JOIN "Detail_Profiles" AS dp ON true,
@@ -537,7 +548,7 @@ _main_profile."calendly_link",
 WHERE
   s_obj ->> 'type' = 'main'
   AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
   AND dp.unique_id =  '${unique_id}'
     ) AS portfolios_ids,
 
@@ -684,7 +695,10 @@ _main_profile."calendly_link",
 _detail_profile.hourly_rate,
     _detail_profile.designation,
 _detail_profile.services,
+_detail_profile.website_purpose,
+    _detail_profile.website_created_for,
     _detail_profile.tag_line,
+    _detail_profile.pdf_urls,
 
  
   
@@ -724,7 +738,9 @@ _detail_profile.services,
                     'starting_date',
                     _portfolios.starting_date,
                     'ending_Date',
-                    _portfolios."ending_Date"))
+                    _portfolios."ending_Date",
+                    'display_order',
+                    _portfolios.display_order))
         from
             "Portfolios" _portfolios
 			JOIN "Detail_Profiles" AS dp ON true,
@@ -733,7 +749,7 @@ _detail_profile.services,
 WHERE
   s_obj ->> 'type' = 'main'
   AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and  _portfolios.content_nature ='prototype'
+  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
   AND dp.unique_id =  '${unique_id}'
     ) AS portfolios_ids,
      (
@@ -874,10 +890,13 @@ _main_profile."calendly_link",
       
     _main_profile."googleAnalyticsScript",
 _detail_profile.services,
+_detail_profile.pdf_urls,
             _detail_profile.designation,
 
-          
+          _detail_profile.website_purpose,
+    _detail_profile.website_created_for,
             _detail_profile.tag_line,
+            
             _detail_profile.skills,
             (
                 select
@@ -926,15 +945,17 @@ _detail_profile.services,
                     'duplicate',
                     _portfolios."duplicate",
                     'ending_Date',
-                    _portfolios."ending_Date"
-                            
+                    _portfolios."ending_Date",
+                    'display_order',
+                    _portfolios.display_order
+                             
                         )
                     ) 
                 from
             "Portfolios" _portfolios
             
         where
-            _portfolios.main_profile_id = _main_profile.id and  content_nature ='prototype'
+            _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  content_nature ='prototype'
 	and _portfolios.id = '${itemID}'
     ) AS portfolios_ids,
      

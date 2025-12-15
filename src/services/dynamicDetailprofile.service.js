@@ -21,7 +21,7 @@ export class dynamicdetailProfileService extends baseService {
     try {
 
 
-      let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title, hourly_rate } = req.body;
+      let { skills, services, tag_line, designation, main_id, domain, is_create_tiny_url, private_title, hourly_rate, website_purpose, website_created_for } = req.body;
       const mainProfileID = main_id;
       domain = 'https://' + domain;
 
@@ -65,7 +65,9 @@ export class dynamicdetailProfileService extends baseService {
         category3_status: false,
         content_nature: 'dynamic',
         companytype: 'cypexsoft',
-        services: services
+        services: services,
+        website_purpose,
+        website_created_for
       }
       response = await this._detailProfileModel.create(detailProfileValuess);
       const mainCategoryID = services.find(service => service.type == 'main').category_id || null;

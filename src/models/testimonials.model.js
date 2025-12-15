@@ -54,6 +54,16 @@ const TestimonialsModel = sequelize.define('Testimonials', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  linked_in: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  instagram: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+
+
 });
 TestimonialsModel.sync({ alter: true });
 export default TestimonialsModel;

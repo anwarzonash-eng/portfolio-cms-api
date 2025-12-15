@@ -333,6 +333,7 @@ export class portfolioService extends baseService {
 
     let whereClause = '';
 
+
     // If id is provided, use it as the only filter
     if (id) {
       whereClause = `WHERE id = '${id}'`;

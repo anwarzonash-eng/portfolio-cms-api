@@ -180,6 +180,16 @@ const detailProfileModel = sequelize.define('Detail_Profiles', {
     type: DataTypes.INTEGER,
     defaultValue: 15
   },
+  website_purpose: {
+    type: DataTypes.ENUM,
+    values: ['upwork', 'other_freelance_or_remote_jobs', 'real_office_jobs_remote_hybrid', 'startups_clients'],
+    allowNull: true,
+  },
+
+  website_created_for: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 });
 detailProfileModel.sync({ alter: true });
 export default detailProfileModel;

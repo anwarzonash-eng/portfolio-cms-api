@@ -90,6 +90,11 @@ const protfolioModel = sequelize.define('Portfolios', {
     defaultValue: false,
   },
 
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+
   content_nature: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -139,6 +144,14 @@ const protfolioModel = sequelize.define('Portfolios', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+
+  testimonial_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+
+
+
 });
 protfolioModel.sync({ alter: true });
 export default protfolioModel;
