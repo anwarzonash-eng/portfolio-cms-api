@@ -23,138 +23,8 @@ export class reportService extends baseService {
         let itemID = req.body.itemID;
 
         let query = '';
-        if (type == 'home')
-            query = `select
-        (select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _categories.id,
-                    'label',
-                    _categories.label,
-                    'title',
-                    _categories.title,
-                    'designation',
-                    _categories.designation,
-					'tagline',
-                    _categories.tagline,
-					'intro',
-                    _categories.intro,
-					'"mainIntro"',
-                    _categories."mainIntro",
-					'experience_intro',
-                    _categories.experience_intro,
-					'short_description',
-                    _categories.short_description,
-					'thumbnail',
-                    _categories.thumbnail,
-					'intro_heading',
-                    _categories.intro_heading,
-					'"mainIntro_heading"',
-                    _categories."mainIntro_heading",
-					'skills_ids',
-                    _categories.skills_ids
-					
-                    )) 
-        from
-            "Categories" _categories) as Skills_Categories,
-            (select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _dynamicGeneration.id,
-                    'description',
-                    _dynamicGeneration.description,
-                    'skills_ids',
-                    _dynamicGeneration.skills_ids,
-                    'experience_variation1',
-                    _dynamicGeneration.experience_variation1,
-					'experience_variation2',
-                    _dynamicGeneration.experience_variation2,
-					'experience_variation3',
-                    _dynamicGeneration.experience_variation3,
-					'experience_variation4',
-                    _dynamicGeneration.experience_variation4,
-					'experience_variation5',
-                    _dynamicGeneration.experience_variation5,
-					'experience_variation9',
-                    _dynamicGeneration.experience_variation9,
-					'experience_variation10',
-                    _dynamicGeneration.experience_variation10,
-					'experience_variation6',
-                    _dynamicGeneration.experience_variation6,
-					'experience_variation7',
-                    _dynamicGeneration.experience_variation7,
-					'experience_variation8',
-                    _dynamicGeneration.experience_variation8,
-					'portfolio_variations',
-                    _dynamicGeneration.portfolio_variations
-					
-                    )) 
-        from
-            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
-        
-    _main_profile.profile_photo_1,
-    _main_profile.profile_photo_2,
-       _main_profile.profile_photo_3,
-    _main_profile.name,
-    _main_profile.home_page_tagline,
-    _main_profile.domain,
-    _main_profile.email,
-    _main_profile."linkedIn",
-    _main_profile.facebook,
-    _main_profile.twitter,
-    _main_profile.instagram,
-    _main_profile.upwork,
-    _main_profile.github,
-    _main_profile."behance_link",
-    _main_profile.phone_no,
-    _main_profile.location,
-_main_profile."calendly_link",
-
-    _main_profile.companytype,
-    _main_profile.color1,
-    _main_profile.color2, 
-    _main_profile.color3,
-    _main_profile.color4,
-    
-     _main_profile.primary_color,
-      _main_profile.page_bg_color,
-       _main_profile.banner_bg_color,
-        _main_profile.section_bg_color,
-         _main_profile.heading_color,
-          _main_profile.paragrapgh1_color,
-           _main_profile.paragrapgh2_color,
-            _main_profile.border_color,
-            
- 
-      
-     _main_profile.no_of_experiences,
-     _main_profile.projects_completed,
-  
-    _main_profile."googleAnalyticsScript",
-
-
-
-    _detail_profile.designation,
-    _detail_profile.website_purpose,
-    _detail_profile.website_created_for,
-
-
-    _detail_profile.tag_line,
-    _detail_profile.pdf_urls,
-    _detail_profile.short_description,
-	_detail_profile.description,
-_detail_profile.category1_title,
-_detail_profile.category1_description,
-_detail_profile.category2_title,
-_detail_profile.category2_description,
-_detail_profile.category2_status,
-_detail_profile.category3_title,
-_detail_profile.services,
-_detail_profile."is_pdf_generated",
-_detail_profile."pdf_download_links",
-
+        if (type == 'home' || type == 'cv' || type == 'portfolio')
+            query = `SELECT
 
 json_build_object(
         'id', _video.id,
@@ -162,84 +32,6 @@ json_build_object(
         'private_title', _video.private_title,
         'videoURL', _video.video
     ) AS video_attached,
-
-(
-        select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _portfolios.id,
-                    'title',
-                    _portfolios.title,
-                    'tagline_1',
-                    _portfolios.tagline_1,
-                    'tagline_2',
-                    _portfolios.tagline_2,
-                    'features_short',
-                    _portfolios.features_short,
-                    'tech_short',
-                    _portfolios.tech_short,
-                    'features_long',
-                    _portfolios.features_long,
-                    'tech_long',
-                    _portfolios.tech_long,
-                    'link',
-                    _portfolios.link,
-                    'thumbnail',
-                    _portfolios.thumbnail,
-                    'child_hero_banner',
-                    _portfolios.child_hero_banner,
-                    'has_testimonial',
-                    _portfolios.has_testimonial,
-                    'company_icon',
-                    _portfolios.company_icon,
-                    'pictures',
-                    _portfolios."pictures",
-                    'starting_date',
-                    _portfolios.starting_date,
-                    'ending_Date',
-                    _portfolios."ending_Date",
-                    'display_order',
-                    _portfolios.display_order
-                    ))
-                    from
-            "Portfolios" _portfolios
-			JOIN "Detail_Profiles" AS dp ON true,
-  json_array_elements(dp.services) AS s_obj,
-  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
-WHERE
-  s_obj ->> 'type' = 'main'
-  AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
-  AND dp.unique_id =  '${unique_id}'
-
-    ) AS portfolios_ids,
-
-(
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'icon',
-                                    _skills.icon,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Detail_Profiles" _detail_profile_child,
-                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _detail_profile.id = _detail_profile_child.id
-                    )
-                
-             as skills_ids,
-             
 (
         select
             json_agg(
@@ -277,47 +69,6 @@ WHERE
             _experiences.main_profile_id = _main_profile.id and  content_nature ='prototype'
     ) AS experiences_ids,
 
-
-_detail_profile.hourly_rate,
-_detail_profile.category3_description,
-_detail_profile.category3_status,
-(
-      select
-          json_agg(
-              json_build_object(
-                  'id',
-                  _educations.id,
-                  'university_name',
-                  _educations.university_name,
-                  'university_website_link',
-                  _educations.university_website_link,
-                  'degree_description',
-                  _educations.degree_description,
-                  'degree_name',
-                  _educations.degree_name,
-                  'degree_start_date',
-                  _educations.degree_start_date,
-                  'degree_end_date',
-                  _educations.degree_end_date,
-                  'thumbnail',
-                  _educations.thumbnail
-              )
-          ) as education_details
-      from
-         
-           "Education" _educations where _educations.main_profile_id = _main_profile.id
-     
-  ) AS education_ids
-    
-    from "Detail_Profiles" _detail_profile join "Main_Profiles" _main_profile
-    on _main_profile.id = _detail_profile.main_profile_id
-        LEFT JOIN "Videos" _video ON _detail_profile.video_attached = _video.id::uuid
-
-    where unique_id = '${unique_id}' and "domain" = '${domain}'
-    
-    limit 1`;
-        else if (type == 'cv')
-            query = `select
 (select
             json_agg(
                 json_build_object(
@@ -350,45 +101,54 @@ _detail_profile.category3_status,
 					
                     )) 
         from
-            "Categories" _categories) as Skills_Categories,
-        (select
+            "Categories" _categories 
+ 			WHERE _categories.main_profile_id = _main_profile.id
+			 ) as Skills_Categories,
+
+    (
+        SELECT
             json_agg(
                 json_build_object(
-                    'id',
-                    _dynamicGeneration.id,
-                    'description',
-                    _dynamicGeneration.description,
-                    'skills_ids',
-                    _dynamicGeneration.skills_ids,
-                    'experience_variation1',
-                    _dynamicGeneration.experience_variation1,
-					'experience_variation2',
-                    _dynamicGeneration.experience_variation2,
-					'experience_variation3',
-                    _dynamicGeneration.experience_variation3,
-					'experience_variation4',
-                    _dynamicGeneration.experience_variation4,
-					'experience_variation5',
-                    _dynamicGeneration.experience_variation5,
-					'experience_variation9',
-                    _dynamicGeneration.experience_variation9,
-					'experience_variation10',
-                    _dynamicGeneration.experience_variation10,
-					'experience_variation6',
-                    _dynamicGeneration.experience_variation6,
-					'experience_variation7',
-                    _dynamicGeneration.experience_variation7,
-					'experience_variation8',
-                    _dynamicGeneration.experience_variation8,
-					'portfolio_variations',
-                    _dynamicGeneration.portfolio_variations
-					
-                    )) 
-        from
-            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
-     _main_profile.profile_photo_1,
+                    'id', _dynamicGeneration.id,
+                    'description', _dynamicGeneration.description,
+                    'skills_ids', _dynamicGeneration.skills_ids,
+                    'experience_variation1', _dynamicGeneration.experience_variation1,
+                    'experience_variation2', _dynamicGeneration.experience_variation2,
+                    'experience_variation3', _dynamicGeneration.experience_variation3,
+                    'experience_variation4', _dynamicGeneration.experience_variation4,
+                    'experience_variation5', _dynamicGeneration.experience_variation5,
+                    'experience_variation6', _dynamicGeneration.experience_variation6,
+                    'experience_variation7', _dynamicGeneration.experience_variation7,
+                    'experience_variation8', _dynamicGeneration.experience_variation8,
+                    'experience_variation9', _dynamicGeneration.experience_variation9,
+                    'experience_variation10', _dynamicGeneration.experience_variation10,
+                    'portfolio_variations', _dynamicGeneration.portfolio_variations
+                )
+            )
+        FROM "Dynamic_Generations" _dynamicGeneration
+        WHERE main_profile_id = _main_profile.id
+    ) AS skills_groups,
+
+    (
+        SELECT
+            json_agg(
+                json_build_object(
+                    'id', _skills.id,
+                    'title', _skills.title,
+                    'icon', _skills.icon,
+                    'url', _skills.url,
+                    'order', _skills.order
+                )
+            )
+        FROM "Detail_Profiles" _detail_profile_child
+        JOIN LATERAL json_array_elements_text(_detail_profile_child.skills_ids -> 'skills_ids') AS fk ON true
+        JOIN "Skills" _skills ON _skills.id = fk::uuid
+        WHERE _detail_profile.id = _detail_profile_child.id
+    ) AS skills_ids,
+
+    _main_profile.profile_photo_1,
     _main_profile.profile_photo_2,
-       _main_profile.profile_photo_3,
+    _main_profile.profile_photo_3,
     _main_profile.name,
     _main_profile.home_page_tagline,
     _main_profile.domain,
@@ -402,391 +162,107 @@ _detail_profile.category3_status,
     _main_profile."behance_link",
     _main_profile.phone_no,
     _main_profile.location,
-_main_profile."calendly_link",
+    _main_profile."calendly_link",
     _main_profile.companytype,
     _main_profile.color1,
-    _main_profile.color2, 
+    _main_profile.color2,
     _main_profile.color3,
     _main_profile.color4,
-    
-     _main_profile.primary_color,
-      _main_profile.page_bg_color,
-       _main_profile.banner_bg_color,
-        _main_profile.section_bg_color,
-         _main_profile.heading_color,
-          _main_profile.paragrapgh1_color,
-           _main_profile.paragrapgh2_color,
-            _main_profile.border_color,
-            
- 
-      
-     
-     _main_profile.no_of_experiences,
-     _main_profile.projects_completed,
-      _detail_profile.services,
+    _main_profile.primary_color,
+    _main_profile.page_bg_color,
+    _main_profile.banner_bg_color,
+    _main_profile.section_bg_color,
+    _main_profile.heading_color,
+    _main_profile.paragrapgh1_color,
+    _main_profile.paragrapgh2_color,
+    _main_profile.border_color,
+    _main_profile.no_of_experiences,
+    _main_profile.projects_completed,
     _main_profile."googleAnalyticsScript",
-
     _detail_profile.hourly_rate,
     _detail_profile.designation,
-    _detail_profile.pdf_urls,
-
+    _detail_profile.services,
     _detail_profile.website_purpose,
     _detail_profile.website_created_for,
     _detail_profile.tag_line,
-  
-    _detail_profile.skills,
-
-
-
-(
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'icon',
-                                    _skills.icon,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Detail_Profiles" _detail_profile_child,
-                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _detail_profile.id = _detail_profile_child.id
-                    )
-                
-             as skills_ids,
-  
-
-    (
-        select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _experiences.id,
-                    'title',
-                    _experiences.title,
-                    'short_description',
-                    _experiences.short_description,
-                    'long_description',
-                    _experiences.long_description,
-                    'app_worked_description',
-                    _experiences.app_worked_description,
-                    'tech_descriptions',
-                    _experiences.tech_descriptions,
-                    'company_name',
-                    _experiences.company_name,
-                    'company_website',
-                    _experiences.company_website,
-                    'thumbnail',
-                    _experiences.thumbnail,
-                    'company_linkedIn',
-                    _experiences."company_linkedIn",
-                    'starting_date',
-                    _experiences.starting_date,
-                    'ending_Date',
-                    _experiences."ending_Date"
-                    
-                )
-            ) 
-        from
-           "Experiences" _experiences
-        where
-            _experiences.main_profile_id = _main_profile.id and  content_nature ='prototype'
-    ) AS experiences_ids,
-    
-
-    (
-        select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _portfolios.id,
-                    'title',
-                    _portfolios.title,
-                    'tagline_1',
-                    _portfolios.tagline_1,
-                    'tagline_2',
-                    _portfolios.tagline_2,
-                    'features_short',
-                    _portfolios.features_short,
-                    'tech_short',
-                    _portfolios.tech_short,
-                    'features_long',
-                    _portfolios.features_long,
-                    'tech_long',
-                    _portfolios.tech_long,
-                    'link',
-                    _portfolios.link,
-                    'thumbnail',
-                    _portfolios.thumbnail,
-                    'child_hero_banner',
-                    _portfolios.child_hero_banner,
-                    'has_testimonial',
-                    _portfolios.has_testimonial,
-                    'company_icon',
-                    _portfolios.company_icon,
-                    'pictures',
-                    _portfolios."pictures",
-                    'starting_date',
-                    _portfolios.starting_date,
-                    'ending_Date',
-                    _portfolios."ending_Date",
-                    'display_order',
-                    _portfolios.display_order))
-        from
-            "Portfolios" _portfolios
-			JOIN "Detail_Profiles" AS dp ON true,
-  json_array_elements(dp.services) AS s_obj,
-  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
-WHERE
-  s_obj ->> 'type' = 'main'
-  AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
-  AND dp.unique_id =  '${unique_id}'
-    ) AS portfolios_ids,
-
-
-
-
-    (
-      select
-          json_agg(
-              json_build_object(
-                  'id',
-                  _educations.id,
-                  'university_name',
-                  _educations.university_name,
-                  'university_website_link',
-                  _educations.university_website_link,
-                  'degree_description',
-                  _educations.degree_description,
-                  'degree_name',
-                  _educations.degree_name,
-                  'degree_start_date',
-                  _educations.degree_start_date,
-                  'degree_end_date',
-                  _educations.degree_end_date,
-                  'thumbnail',
-                  _educations.thumbnail
-              )
-          ) as education_details
-      from
-         
-           "Education" _educations where _educations.main_profile_id = _main_profile.id
-     
-  ) AS education_ids
-    
-from
-    "Detail_Profiles" _detail_profile
-    join "Main_Profiles" _main_profile on _main_profile.id = _detail_profile.main_profile_id
-where
-    unique_id = '${unique_id}'
-    and "domain" = '${domain}'
-limit
-    1`;
-        else if (type == 'portfolio')
-            query = `select
-
-        (select
-            json_agg(
-                json_build_object(
-                    'id',
-                    _dynamicGeneration.id,
-                    'description',
-                    _dynamicGeneration.description,
-                    'skills_ids',
-                    _dynamicGeneration.skills_ids,
-                    'experience_variation1',
-                    _dynamicGeneration.experience_variation1,
-					'experience_variation2',
-                    _dynamicGeneration.experience_variation2,
-					'experience_variation3',
-                    _dynamicGeneration.experience_variation3,
-					'experience_variation4',
-                    _dynamicGeneration.experience_variation4,
-					'experience_variation5',
-                    _dynamicGeneration.experience_variation5,
-					'experience_variation9',
-                    _dynamicGeneration.experience_variation9,
-					'experience_variation10',
-                    _dynamicGeneration.experience_variation10,
-					'experience_variation6',
-                    _dynamicGeneration.experience_variation6,
-					'experience_variation7',
-                    _dynamicGeneration.experience_variation7,
-					'experience_variation8',
-                    _dynamicGeneration.experience_variation8,
-					'portfolio_variations',
-                    _dynamicGeneration.portfolio_variations
-					
-                    )) 
-        from
-            "Dynamic_Generations" _dynamicGeneration where main_profile_id = _main_profile.id) as skills_groups,
-            (
-                        select
-                            json_agg(
-                                json_build_object(
-                                    'id',
-                                    _skills.id,
-                                    'title',
-                                    _skills.title,
-                                    'icon',
-                                    _skills.icon,
-                                    'url',
-                                    _skills.url,
-                                    'order', _skills.order
-                                )
-                            ) as skills_ids
-                        from
-                            "Detail_Profiles" _detail_profile_child,
-                            json_array_elements_text(skills_ids -> 'skills_ids') as fk
-                            join "Skills" _skills on _skills.id = fk :: uuid
-                        where
-                            _detail_profile.id = _detail_profile_child.id
-                    )
-                
-             as skills_ids,
-    _main_profile.profile_photo_1,
-    _main_profile.profile_photo_2,
-       _main_profile.profile_photo_3,
-    _main_profile.name,
-    _main_profile.home_page_tagline,
-    _main_profile.domain,
-    _main_profile.email,
-    _main_profile."linkedIn",
-    _main_profile.facebook,
-    _main_profile.twitter,
-    _main_profile.instagram,
-    _main_profile.upwork,
-    _main_profile.github,
-    _main_profile."behance_link",
-    _main_profile.phone_no,
-    _main_profile.location,
-_main_profile."calendly_link",
-    _main_profile.companytype,
-    _main_profile.color1,
-    _main_profile.color2, 
-    _main_profile.color3,
-    _main_profile.color4,
-    
-     _main_profile.primary_color,
-      _main_profile.page_bg_color,
-       _main_profile.banner_bg_color,
-        _main_profile.section_bg_color,
-         _main_profile.heading_color,
-          _main_profile.paragrapgh1_color,
-           _main_profile.paragrapgh2_color,
-            _main_profile.border_color,
-            
- 
-      
-     
-     _main_profile.no_of_experiences,
-     _main_profile.projects_completed,
-      
-    _main_profile."googleAnalyticsScript",
-_detail_profile.hourly_rate,
-    _detail_profile.designation,
-_detail_profile.services,
-_detail_profile.website_purpose,
-    _detail_profile.website_created_for,
-    _detail_profile.tag_line,
     _detail_profile.pdf_urls,
-
- 
-  
+	_detail_profile.short_description,
+	_detail_profile.description,
+	_detail_profile.category1_title,
+_detail_profile.category1_description,
+_detail_profile.category2_title,
+_detail_profile.category2_description,
+_detail_profile.category2_status,
+_detail_profile.category3_title,
+_detail_profile.services,
+_detail_profile."is_pdf_generated",
+_detail_profile."pdf_download_links",
     _detail_profile.skills,
+
+    -- Fixed portfolios_ids subquery
     (
-        select
+        SELECT
             json_agg(
                 json_build_object(
-                    'id',
-                    _portfolios.id,
-                    'title',
-                    _portfolios.title,
-                    'tagline_1',
-                    _portfolios.tagline_1,
-                    'tagline_2',
-                    _portfolios.tagline_2,
-                    'features_short',
-                    _portfolios.features_short,
-                    'tech_short',
-                    _portfolios.tech_short,
-                    'features_long',
-                    _portfolios.features_long,
-                    'tech_long',
-                    _portfolios.tech_long,
-                    'link',
-                    _portfolios.link,
-                    'thumbnail',
-                    _portfolios.thumbnail,
-                    'child_hero_banner',
-                    _portfolios.child_hero_banner,
-                    'has_testimonial',
-                    _portfolios.has_testimonial,
-                    'company_icon',
-                    _portfolios.company_icon,
-                    'pictures',
-                    _portfolios."pictures",
-                    'starting_date',
-                    _portfolios.starting_date,
-                    'ending_Date',
-                    _portfolios."ending_Date",
-                    'display_order',
-                    _portfolios.display_order))
-        from
-            "Portfolios" _portfolios
-			JOIN "Detail_Profiles" AS dp ON true,
-  json_array_elements(dp.services) AS s_obj,
-  json_array_elements_text(_portfolios.categorys -> 'category_ids') AS p_cat_id
-WHERE
-  s_obj ->> 'type' = 'main'
-  AND s_obj ->> 'category_id' = p_cat_id
-  AND _portfolios.main_profile_id = _main_profile.id and _portfolios.is_active = true and  _portfolios.content_nature ='prototype'
-  AND dp.unique_id =  '${unique_id}'
+                    'id', _portfolios.id,
+                    'title', _portfolios.title,
+                    'tagline_1', _portfolios.tagline_1,
+                    'tagline_2', _portfolios.tagline_2,
+                    'features_short', _portfolios.features_short,
+                    'tech_short', _portfolios.tech_short,
+                    'features_long', _portfolios.features_long,
+                    'tech_long', _portfolios.tech_long,
+                    'link', _portfolios.link,
+                    'thumbnail', _portfolios.thumbnail,
+                    'child_hero_banner', _portfolios.child_hero_banner,
+                    'has_testimonial', _portfolios.has_testimonial,
+                    'company_icon', _portfolios.company_icon,
+                    'pictures', _portfolios."pictures",
+                    'starting_date', _portfolios.starting_date,
+                    'ending_Date', _portfolios."ending_Date",
+                    'display_order', _portfolios.display_order
+                )
+            )
+        FROM "Detail_Profiles" dp
+        JOIN LATERAL json_array_elements(dp.services) AS s_obj ON s_obj ->> 'type' = 'main'
+        JOIN "Portfolios" _portfolios
+            ON _portfolios.main_profile_id = _main_profile.id
+           AND _portfolios.is_active = true
+           AND _portfolios.content_nature = 'prototype'
+           AND (_portfolios.categorys::jsonb -> 'category_ids') ? (s_obj ->> 'category_id')
+        WHERE dp.unique_id = _detail_profile.unique_id
+          AND dp.main_profile_id = _main_profile.id
     ) AS portfolios_ids,
-     (
-      select
-          json_agg(
-              json_build_object(
-                  'id',
-                  _educations.id,
-                  'university_name',
-                  _educations.university_name,
-                  'university_website_link',
-                  _educations.university_website_link,
-                  'degree_description',
-                  _educations.degree_description,
-                  'degree_name',
-                  _educations.degree_name,
-                  'degree_start_date',
-                  _educations.degree_start_date,
-                  'degree_end_date',
-                  _educations.degree_end_date,
-                  'thumbnail',
-                  _educations.thumbnail
-              )
-          ) as education_details
-      from
-         
-           "Education" _educations where _educations.main_profile_id = _main_profile.id
-     
-  ) AS education_ids
-from
-    "Detail_Profiles" _detail_profile
-    join "Main_Profiles" _main_profile on _main_profile.id = _detail_profile.main_profile_id
-where
-    unique_id = '${unique_id}'
-    and "domain" = '${domain}'
-limit
-    1`;
+
+    -- education_ids
+    (
+        SELECT
+            json_agg(
+                json_build_object(
+                    'id', _educations.id,
+                    'university_name', _educations.university_name,
+                    'university_website_link', _educations.university_website_link,
+                    'degree_description', _educations.degree_description,
+                    'degree_name', _educations.degree_name,
+                    'degree_start_date', _educations.degree_start_date,
+                    'degree_end_date', _educations.degree_end_date,
+                    'thumbnail', _educations.thumbnail
+                )
+            )
+        FROM "Education" _educations
+        WHERE _educations.main_profile_id = _main_profile.id
+    ) AS education_ids
+
+FROM "Detail_Profiles" _detail_profile
+JOIN "Main_Profiles" _main_profile
+    ON _main_profile.id = _detail_profile.main_profile_id
+	LEFT JOIN "Videos" _video ON _detail_profile.video_attached = _video.id::uuid
+WHERE _detail_profile.unique_id = '${unique_id}'
+  AND _main_profile.domain = '${domain}'
+LIMIT 1;
+`;
+
+
         else if (type == 'portfolioById')
             query = `select
         (select
