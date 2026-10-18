@@ -1,4 +1,4 @@
-# Personal Website Backend
+﻿# Portfolio CMS API
 
 A REST API that powers my personal portfolio / CV website and its admin panel. It stores profile data (experience, education, skills, portfolios, testimonials, photos, videos), generates CV / home / portfolio reports, manages email templates and short URLs, and can send emails with attachments through Gmail.
 
