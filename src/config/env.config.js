@@ -11,4 +11,8 @@ export default {
   adminEmail: process.env.adminEmail,
   adminPassword: process.env.adminPassword,
   dbString: process.env.DB_String,
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleRefreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+  mailSender: process.env.MAIL_SENDER,
 };

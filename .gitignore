@@ -1,14 +1,21 @@
-node_modules
-/node_modules
-build
-.idea
-./dist
-dist
+# dependencies
+node_modules/
 
-./.env
+# build output
+dist/
+build/
 
-# migration
+# environment files (never commit real credentials)
+.env
+.env.*
+!.env.example
+
+# editor
+.idea/
+.vscode/
+
+# generated / temporary
 src/migrations/*.json
-
-#video convert
-temp
+temp/
+uploads/
+*.log

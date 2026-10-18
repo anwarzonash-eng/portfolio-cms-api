@@ -6,13 +6,13 @@ import { createTransport } from 'nodemailer';
 import { google } from 'googleapis';
 import fs from 'fs';
 import { deletePhotoWhileUpdate } from '../utils/deletePhotoWhileUpdate';
+import { Env } from '../config';
 
 const uploadPhoto = require('../utils/aws/s3');
 
 export class portfolioService extends baseService {
   async sendEmail(req) {
     const file = req.files.attachment;
-    const email_type = req.body.email_type;
 
     const attachments = [];
 
@@ -33,29 +33,14 @@ export class portfolioService extends baseService {
 
     // console.log(attachments);
 
-    const client_id =
-      'REMOVED_GOOGLE_CLIENT_ID';
-    const client_Secret = 'REMOVED_GOOGLE_CLIENT_SECRET';
-    const referesh_token_owner =
-      'REMOVED_REFRESH_TOKEN';
-    const referesh_token_atif =
-      'REMOVED_REFRESH_TOKEN';
-    const referesh_token_cypexsoft =
-      'REMOVED_REFRESH_TOKEN';
-    var referesh_token = '';
-    var user = '';
+    // Gmail OAuth2 credentials come from the environment (see .env.example).
+    const client_id = Env.googleClientId;
+    const client_Secret = Env.googleClientSecret;
+    const referesh_token = Env.googleRefreshToken;
+    const user = Env.mailSender;
 
-    if (email_type == 'atif') {
-      referesh_token = referesh_token_atif;
-      user = 'user-a@example.com';
-    } else if (email_type == 'owner') {
-      referesh_token = referesh_token_owner;
-      user = 'you@example.com';
-    } else if (email_type == 'cypexsoft') {
-      referesh_token = referesh_token_cypexsoft;
-      user = 'user-b@example.com';
-    } else {
-      throw new Error('Invalid email type');
+    if (!client_id || !client_Secret || !referesh_token || !user) {
+      throw new Error('Email is not configured: set the GOOGLE_* and MAIL_SENDER variables');
     }
 
     const redirect_url = 'https://developers.google.com/oauthplayground';
@@ -85,7 +70,7 @@ export class portfolioService extends baseService {
     });
 
     const emailOptions = {
-      from: 'you@example.com',
+      from: user,
       to: req.body.to,
       subject: req.body.subject,
       text: req.body.body,
@@ -105,30 +90,6 @@ export class portfolioService extends baseService {
     // console.log(emailOptions);
 
     await transporter.sendMail(emailOptions);
-
-    // Create a transporter object using SMTP
-    // const transporter = nodemailer.createTransport({
-    //   host: 'smtp.gmail.com',
-    //   port: 465,
-    //   secure: true, // true for 465, false for other ports
-    //   auth: {
-    //     user: 'you@example.com', // Your Gmail address
-    //     pass: 'REMOVED_PASSWORD' // Your Gmail password
-    //   }
-    // });
-
-    // Email options
-    // const mailOptions = {
-    //   from: 'you@example.com', // sender address
-    //   to: 'you@example.com', // list of receivers
-    //   subject: 'Test Email with Attachment', // Subject line
-    //   text: 'Please see the attached file.', // Plain text body
-    //   html: '<b>Please see the attached file.</b>', // HTML body
-
-    // };
-
-    // // Send email
-    // await transporter.sendMail(mailOptions);
   }
 
   async sync(req) {
